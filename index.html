@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XaniStudio — Студия Minecraft разработки</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF7D1A',
+                        dark: '#1E1E1E',
+                        light: '#F8F8F8'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #F8F8F8;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(255,125,26,0.1) 0%, rgba(255,125,26,0.03) 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #FF7D1A;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="text-dark">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="https://i.ibb.co/Z1VBqxzj/java-icon-512x512-kvr1nudq-1.png" alt="XaniStudio Logo" class="h-10 w-10">
+                <span class="text-2xl font-bold text-primary">Xani<span class="text-dark">Studio</span></span>
+            </div>
+            
+            <nav class="hidden md:flex space-x-8">
+                <a href="#services" class="nav-link font-medium">Услуги</a>
+                <a href="#prices" class="nav-link font-medium">Цены</a>
+                <a href="#portfolio" class="nav-link font-medium">Портфолио</a>
+                <a href="#about" class="nav-link font-medium">О нас</a>
+                <a href="#contacts" class="nav-link font-medium">Контакты</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <a href="#" class="bg-primary text-white px-6 py-2 rounded-md font-medium hover:bg-opacity-90 transition">Заказать</a>
+                <button class="md:hidden text-dark">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-20">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 space-y-6 mb-10 md:mb-0">
+                <h1 class="text-5xl font-bold leading-tight">
+                    Разработка <span class="text-primary">Minecraft</span> проектов
+                </h1>
+                <p class="text-xl text-gray-600">
+                    Создаем уникальные проекты для вашего сервера. Качество, профессионализм и индивидуальный подход к каждому клиенту.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#contacts" class="bg-primary text-white px-8 py-3 rounded-md font-medium hover:bg-opacity-90 transition">Связаться</a>
+                    <a href="#portfolio" class="border-2 border-primary text-primary px-8 py-3 rounded-md font-medium hover:bg-primary hover:text-white transition">Портфолио</a>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <img src="https://i.ibb.co/Z1VBqxzj/java-icon-512x512-kvr1nudq-1.png" alt="Minecraft разработка" class="rounded-lg shadow-xl w-full max-w-lg">
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Наши услуги</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Мы предлагаем полный цикл разработки для вашего Minecraft сервера</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="bg-light rounded-xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-code text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Разработка плагинов</h3>
+                    <p class="text-gray-600">
+                        Создаем уникальные плагины любой сложности под ваши нужды. Гибкие настройки, оптимизация и оригинальные идеи.
+                    </p>
+                </div>
+                
+                <!-- Service 2 -->
+                <div class="bg-light rounded-xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-server text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Настройка серверов</h3>
+                    <p class="text-gray-600">
+                        Профессиональная настройка и оптимизация серверов. Работаем со всеми популярными ядрами.
+                    </p>
+                </div>
+                
+                <!-- Service 3 -->
+                <div class="bg-light rounded-xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-paint-brush text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Дизайн</h3>
+                    <p class="text-gray-600">
+                        Создаем потрясающий дизайн для вашего сервера: логотипы, баннеры, текстуры и многое другое.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prices Section -->
+    <section id="prices" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Наши цены</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Гибкая система ценообразования для каждого клиента</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Price 1 -->
+                <div class="bg-white rounded-xl p-8 shadow-md card-hover border-l-4 border-primary">
+                    <h3 class="text-2xl font-bold mb-4">Базовый плагин</h3>
+                    <p class="text-4xl font-bold mb-6 text-primary">от 100 ₽</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Основной функционал</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Техническая поддержка 3 дня</span>
+                        </li>
+						<li class="flex items-center text-gray-400">
+                            <i class="fas fa-times text-red-400 mr-3"></i>
+                            <span>Использование конфигов</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-times text-red-400 mr-3"></i>
+                            <span>Использование API</span>
+                        </li>
+                    </ul>
+                    <a href="#" class="block text-center bg-primary text-white py-3 rounded-md font-medium hover:bg-opacity-90 transition">Заказать</a>
+                </div>
+                
+                <!-- Price 2 -->
+                <div class="bg-white rounded-xl p-8 shadow-lg card-hover border-l-4 border-primary transform scale-105">
+                    <div class="absolute top-0 right-0 bg-primary text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium">Популярно</div>
+                    <h3 class="text-2xl font-bold mb-4">Стандартный плагин</h3>
+                    <p class="text-4xl font-bold mb-6 text-primary">от 1 000 ₽</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Расширенный функционал</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Гибкие настройки</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Техническая поддержка 1 месяца</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-times text-red-400 mr-3"></i>
+                            <span>Использование API</span>
+                        </li>
+                    </ul>
+                    <a href="#" class="block text-center bg-primary text-white py-3 rounded-md font-medium hover:bg-opacity-90 transition">Заказать</a>
+                </div>
+                
+                <!-- Price 3 -->
+                <div class="bg-white rounded-xl p-8 shadow-md card-hover border-l-4 border-primary">
+                    <h3 class="text-2xl font-bold mb-4">Премиум плагин</h3>
+                    <p class="text-4xl font-bold mb-6 text-primary">от 10 000 ₽</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Уникальный сложный функционал</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Полностью кастомизируемый</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Техническая поддержка 3 месяцев</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Полное использование API</span>
+                        </li>
+                    </ul>
+                    <a href="#" class="block text-center bg-primary text-white py-3 rounded-md font-medium hover:bg-opacity-90 transition">Заказать</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Наши работы</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Примеры проектов, которые мы разработали для наших клиентов</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <!-- Project 1 -->
+                <div class="relative group overflow-hidden rounded-xl shadow-md card-hover">
+                    <img src="https://placeholder.com/400x250" alt="Проект 1" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-6">
+                        <div>
+                            <h3 class="text-white text-xl font-bold mb-2">DellMine</h3>
+                            <p class="text-gray-300">Тот самый сервер со множество механик.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project 2 -->
+                <div class="relative group overflow-hidden rounded-xl shadow-md card-hover">
+                    <img src="https://placeholder.com/400x250" alt="Проект 2" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-6">
+                        <div>
+                            <h3 class="text-white text-xl font-bold mb-2">xVanilka</h3>
+                            <p class="text-gray-300"> Скоро... </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project 3 -->
+                <div class="relative group overflow-hidden rounded-xl shadow-md card-hover">
+                    <img src="https://placeholder.com/400x250" alt="Проект 3" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-6">
+                        <div>
+                            <h3 class="text-white text-xl font-bold mb-2">BeaGrief</h3>
+                            <p class="text-gray-300">BeaGrief – Minecraft сервер с грифом и темой пчеловодства. Оранжево-желтая атмосфера.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="#" class="inline-flex items-center font-medium text-primary">
+                    Смотреть все работы
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servers Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">С какими ядрами мы работаем</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Мы имеем опыт работы с различными платформами</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                <!-- Server 1 -->
+                <div class="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm">
+                    <img src="https://placeholder.com/100x100" alt="Spigot" class="h-16 w-16 mb-4">
+                    <h3 class="text-xl font-bold mb-2">Spigot</h3>
+                    <p class="text-gray-600 text-center">Поддержка самой популярной платформы</p>
+                </div>
+                
+                <!-- Server 2 -->
+                <div class="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm">
+                    <img src="https://placeholder.com/100x100" alt="Paper" class="h-16 w-16 mb-4">
+                    <h3 class="text-xl font-bold mb-2">Paper</h3>
+                    <p class="text-gray-600 text-center">Работа с оптимизированным форком Spigot</p>
+                </div>
+                
+                <!-- Server 3 -->
+                <div class="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm">
+                    <img src="https://placeholder.com/100x100" alt="BungeeCord" class="h-16 w-16 mb-4">
+                    <h3 class="text-xl font-bold mb-2">Velocity</h3>
+                    <p class="text-gray-600 text-center">Разработка плагинов для прокси</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-primary text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <img src="https://i.ibb.co/jZZnf531/Netherite-Pickaxe-JE3-1.png" alt="О компании" class="rounded-lg shadow-xl w-full">
+                </div>
+                <div class="md:w-1/2 md:pl-12">
+                    <h2 class="text-4xl font-bold mb-6">О нашей студии</h2>
+                    <p class="mb-6 text-lg">
+                        XaniStudio - это профессиональная команда разработчиков, которая специализируется на создании качественных и уникальных проектов для Minecraft.
+                    </p>
+                    <p class="mb-6">
+                        Мы работаем с 2021 года и за это время успели реализовать более 12 проектов различной сложности. Наша миссия - помочь владельцам серверов воплотить в жизнь их идеи.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-3xl font-bold mb-2">12+</p>
+                            <p class="text-gray-200">Завершенных проектов</p>
+                        </div>
+                        <div>
+                            <p class="text-3xl font-bold mb-2">12+</p>
+                            <p class="text-gray-200">Довольных клиентов</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacts Section -->
+    <section id="contacts" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Свяжитесь с нами</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Мы готовы обсудить ваш проект и ответить на все вопросы</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 mb-10 md:mb-0 md:pr-8">
+                    <form class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-gray-700 mb-2">Ваше имя</label>
+                            <input type="text" id="name" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Иван Иванов">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-gray-700 mb-2">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="example@mail.com">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-gray-700 mb-2">Сообщение</label>
+                            <textarea id="message" rows="6" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Расскажите о вашем проекте..."></textarea>
+                        </div>
+                        <button type="submit" class="bg-primary text-white px-8 py-3 rounded-md font-medium hover:bg-opacity-90 transition w-full">Отправить</button>
+                    </form>
+                </div>
+                
+                <div class="md:w-1/2 md:pl-8">
+                    <div class="bg-gray-50 p-8 rounded-xl h-full">
+                        <h3 class="text-2xl font-bold mb-6">Контакты</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="bg-primary bg-opacity-10 rounded-full h-10 w-10 flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">Email</h4>
+                                    <a href="mailto:xani4kastudio@gmail" class="text-gray-600 hover:text-primary transition">xani4kastudio@gmail</a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="bg-primary bg-opacity-10 rounded-full h-10 w-10 flex items-center justify-center mr-4">
+                                    <i class="fab fa-discord text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">Discord</h4>
+                                    <a href="#" class="text-gray-600 hover:text-primary transition">leeganda</a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="bg-primary bg-opacity-10 rounded-full h-10 w-10 flex items-center justify-center mr-4">
+                                    <i class="fab fa-vk text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">VK</h4>
+                                    <a href="#" class="text-gray-600 hover:text-primary transition">vk.com/xanistudio</a>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-6">
+                                <h4 class="font-bold mb-4">График работы</h4>
+                                <p class="text-gray-600">Понедельник - Пятница: 10:00 - 18:00</p>
+                                <p class="text-gray-600">Суббота - Воскресенье: выходной</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img src="https://placeholder.com/40x40" alt="XaniStudio Logo" class="h-8 w-8">
+                        <span class="text-xl font-bold text-primary">Xani<span class="text-white">Studio</span></span>
+                    </div>
+                    <p class="text-gray-400">
+                        Профессиональная разработка Minecraft проектов с 2021 года.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Услуги</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition">Разработка плагинов</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition">Настройка серверов</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition">Консультации</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Информация</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition">О компании</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition">Портфолио</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition">Цены</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Контакты</h4>
+                    <ul class="space-y-2">
+                        <li class="text-gray-400">xani4kastudio@gmail.com</li>
+                        <li class="text-gray-400">leeganda</li>
+                        <li class="text-gray-400">vk.com/xanistudio</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm mb-4 md:mb-0">© 2025 XaniStudio. Все права защищены.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fab fa-vk text-xl"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fab fa-telegram text-xl"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fab fa-discord text-xl"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition"><i class="fab fa-github text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple animation on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fadeIn');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            document.querySelectorAll('section').forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Mobile menu toggle (would need to be implemented)
+        });
+    </script>
+</body>
+</html>
