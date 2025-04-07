@@ -3,191 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal Landing</title>
+    <title>xPanel - Xani4ka KRYTOU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-color: #121212;
-            --text-color: #e0e0e0;
-            --accent-color: #64ffda;
-            --cursor-color: #ffffff;
-            --prompt-color: #4CAF50;
-            --error-color: #ff5252;
-            --input-bg: #1e1e1e;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-            line-height: 1.6;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
-            overflow: hidden;
-        }
-        
-        .terminal-container {
-            flex-grow: 1;
-            background-color: var(--input-bg);
-            border-radius: 4px;
-            padding: 2rem;
-            overflow-y: auto;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-        
-        .terminal-header {
-            display: flex;
-            gap: 0.6rem;
-            margin-bottom: 1.5rem;
-            user-select: none;
-        }
-        
-        .terminal-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        
-        .btn-red { background-color: #ff5f56; }
-        .btn-yellow { background-color: #ffbd2e; }
-        .btn-green { background-color: #27c93f; }
-        
-        .terminal-output {
-            margin-bottom: 1rem;
-        }
-        
-        .prompt {
-            color: var(--prompt-color);
-            margin-right: 0.5rem;
-        }
-        
-        .command {
-            color: var(--accent-color);
-        }
-        
-        .error {
-            color: var(--error-color);
-        }
-        
-        .terminal-input {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        
-        #command-input {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-color);
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-            padding: 0.2rem;
-            caret-color: var(--cursor-color);
-        }
-        
-        #command-input:focus {
-            outline: none;
-        }
-        
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 20px;
-            background-color: var(--cursor-color);
-            margin-left: 2px;
-            animation: blink 1s infinite;
-            vertical-align: middle;
-        }
-        
-        @keyframes blink {
+        @keyframes terminal-blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
-        
-        .hidden {
-            display: none;
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background-color: #4ade80;
+            animation: terminal-blink 1s infinite;
+            vertical-align: middle;
         }
-        
-        .links {
-            margin-top: 1rem;
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+        .glow-text {
+            text-shadow: 0 0 5px rgba(74, 222, 128, 0.7);
         }
-        
-        .link {
-            color: var(--accent-color);
-            text-decoration: none;
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid #4ade80;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: 2px;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
         }
-        
-        .link:hover {
-            color: var(--text-color);
-            text-decoration: underline;
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
         }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            body {
-                padding: 0.5rem;
-            }
-            .terminal-container {
-                padding: 1rem;
-            }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #4ade80; }
+        }
+        .command-output {
+            max-height: 60vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4ade80 #1e293b;
+        }
+        .command-output::-webkit-scrollbar {
+            width: 8px;
+        }
+        .command-output::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .command-output::-webkit-scrollbar-thumb {
+            background-color: #4ade80;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body>
-    <div class="terminal-container">
-        <div class="terminal-header">
-            <div class="terminal-btn btn-red"></div>
-            <div class="terminal-btn btn-yellow"></div>
-            <div class="terminal-btn btn-green"></div>
-            <span>terminal</span>
+<body class="bg-gray-900 text-green-400 font-mono min-h-screen flex flex-col p-4 md:p-8">
+    <div class="max-w-4xl w-full mx-auto flex-grow flex flex-col">
+        <!-- Terminal Header -->
+        <div class="flex items-center gap-2 mb-4 select-none">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="ml-2 text-sm">Terminal (здесь живет Хани)</span>
         </div>
-        
-        <div class="terminal-output">
-            <div class="output-line"><span class="prompt">$</span> <span class="command">welcome</span> --user=guest</div>
-            <div class="output-line">
-                <pre style="font-family: inherit;">
-  _____               _ _             
- |_   _| __ _   _ ___(_|_) ___  _ __  
-   | || '__| | | / __| | |/ _ \| '_ \ 
-   | || |  | |_| \__ \ | | (_) | | | |
-   |_||_|   \__,_|___/_|_|\___/|_| |_|
-                </pre>
+
+        <!-- Terminal Body -->
+        <div class="bg-gray-800 rounded-lg shadow-xl border border-gray-700 flex-grow flex flex-col overflow-hidden">
+            <!-- Terminal Content -->
+            <div class="p-4 md:p-6 flex-grow flex flex-col">
+                <!-- Initial Output -->
+                <div class="command-output mb-4 pr-2" id="command-history">
+                    <div class="mb-4">
+                        <div class="flex items-baseline">
+                            <span class="text-green-500 mr-2">$</span>
+                            <span class="text-green-300 glow-text">connect</span> <span class="text-gray-400">&nbsp;127.0.0.1 --user=visitor --root=false --xani=net</span>
+                        </div>
+                        <pre class="mt-2 text-green-400">
+      _   _                      
+     | | | |                     
+__  _| |_| | ___  _ __ ___   ___ 
+\ \/ /  _  |/ _ \| '_ ` _ \ / _ \
+ >  <| | | | (_) | | | | | |  __/
+/_/\_\_| |_/\___/|_| |_| |_|\___|
+ Trial Period 15 days,
+ create by xani4ka
+                        </pre>
+                        <div class="mt-2">
+                            Welcome to <span class="text-green-300">Xani Home</span>. Type <span class="text-green-300">help</span> to see available commands.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Command Input -->
+                <div class="mt-auto">
+                    <div class="flex items-baseline">
+                        <span class="text-green-500 mr-2">$</span>
+                        <input type="text" id="command-input" autocomplete="off" autofocus 
+                            class="bg-transparent border-none outline-none flex-grow text-green-300 caret-green-500"
+                            placeholder="type 'help' for commands">
+                        <span class="terminal-cursor"></span>
+                    </div>
+                </div>
             </div>
-            <div class="output-line">Welcome to my terminal-style landing page. Type <span class="command">help</span> to see available commands.</div>
-        </div>
-        
-        <div id="command-history"></div>
-        
-        <div class="terminal-input">
-            <span class="prompt">$</span>
-            <input type="text" id="command-input" autocomplete="off" autofocus>
-            <span class="cursor"></span>
-        </div>
-        
-        <div class="links hidden" id="quick-links">
-            <a href="#about" class="link" onclick="executeCommand('about')"><i class="fas fa-user"></i> about</a>
-            <a href="#projects" class="link" onclick="executeCommand('projects')"><i class="fas fa-code"></i> projects</a>
-            <a href="#contact" class="link" onclick="executeCommand('contact')"><i class="fas fa-envelope"></i> contact</a>
-            <a href="https://github.com" target="_blank" class="link"><i class="fab fa-github"></i> github</a>
-            <a href="https://linkedin.com" target="_blank" class="link"><i class="fab fa-linkedin"></i> linkedin</a>
+
+            <!-- Status Bar -->
+            <div class="bg-gray-900 text-gray-400 text-xs p-2 flex justify-between items-center border-t border-gray-700">
+                <div>
+                    <span class="hidden md:inline">Xани не кодер v1.0.0 - Beta</span>
+                    <span class="md:hidden">Нахцй ты с телефона?</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span id="current-time"></span>
+                    <span class="hidden md:inline">|</span>
+                    <span id="connection-status" class="flex items-center">
+                        <i class="fas fa-wifi mr-1"></i>
+                        <span class="hidden md:inline">Connected</span>
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -196,7 +128,16 @@
             const commandInput = document.getElementById('command-input');
             const commandHistory = document.getElementById('command-history');
             const quickLinks = document.getElementById('quick-links');
+            const currentTime = document.getElementById('current-time');
             
+            // Update time
+            function updateTime() {
+                const now = new Date();
+                currentTime.textContent = now.toLocaleTimeString();
+            }
+            setInterval(updateTime, 1000);
+            updateTime();
+
             // Available commands
             const commands = {
                 help: {
@@ -204,7 +145,7 @@
                     execute: function() {
                         addOutput("Available commands:", false);
                         Object.keys(commands).forEach(cmd => {
-                            addOutput(`  <span class="command">${cmd}</span> - ${commands[cmd].description}`, false);
+                            addOutput(`  <span class="text-green-300">${cmd}</span> - ${commands[cmd].description}`, false);
                         });
                     }
                 },
@@ -217,81 +158,124 @@
                 about: {
                     description: "Show information about me",
                     execute: function() {
-                        addOutput(`<span class="command">about</span>`, true);
-                        addOutput("I'm a passionate developer creating digital experiences.", false);
-                        addOutput("Specialized in web technologies with a focus on clean, efficient code.", false);
+                        addOutput(`<span class="text-green-300">about</span>`, true);
+                        addOutput("I'm a self-taught programmer who loves automation and building simple but useful tools.", false);
+                        addOutput("I enjoy working with Python, Telegram bots, databases, and Minecraft plugin development.", false);
+                        addOutput("Always learning and improving, especially in scripting and practical tech solutions.", false);
                     }
                 },
-                projects: {
-                    description: "Show my projects",
+                hardware: {
+                    description: "VDS info",
                     execute: function() {
-                        addOutput(`<span class="command">projects</span>`, true);
-                        addOutput("1. Terminal Portfolio - A unique CLI-style portfolio", false);
-                        addOutput("2. Data Visualization Dashboard - Interactive analytics tool", false);
-                        addOutput("3. E-commerce Platform - Full-stack online store solution", false);
+						addOutput("<span class='text-green-300'>CPU</span>", false);
+						addOutput(`Architecture:           x86_64`, false);
+						addOutput(`CPU op-mode(s):         32-bit, 64-bit`, false);
+						addOutput(`CPU(s):                 6`, false);
+						addOutput(`Thread(s) per core:     2`, false);
+						addOutput(`Core(s) per socket:     3`, false);
+						addOutput(`Model name:             AMD Ryzen 5 3600 6-Core Processor`, false);
+						addOutput(`CPU MHz:                3600.000`, false);
+						addOutput(`L1d cache:              192 KiB`, false);
+						addOutput(`L2 cache:               3 MiB`, false);
+						addOutput(`L3 cache:               32 MiB`, false);
+                    }
+                },
+                reboot: {
+                    description: "Reboot panel",
+                    execute: function() {
+                        addOutput("<span class='text-green-300'>poiiiel naxyu</span> (WORK ONLY WITH ROOT)", false);
                     }
                 },
                 contact: {
                     description: "Show contact information",
                     execute: function() {
-                        addOutput(`<span class="command">contact</span>`, true);
-                        addOutput("Email: hello@example.com", false);
-                        addOutput("Twitter: @username", false);
+                        addOutput(`<span class="text-green-300">Contact</span>`, true);
+                        addOutput("<span class='text-green-300'>Email:</span> root@xani4ka.pp.ua", false);
+                        addOutput("<span class='text-green-300'>TG:</span> soon...", false);
                     }
                 },
-                links: {
-                    description: "Toggle quick navigation links",
-                    execute: function() {
-                        quickLinks.classList.toggle('hidden');
+                theme: {
+                    description: "Change terminal theme",
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            addOutput("Available themes: dark, light, cyberpunk, matrix", false);
+                            return;
+                        }
+                        
+                        const theme = args[0].toLowerCase();
+                        switch(theme) {
+                            case 'dark':
+                                document.body.className = 'bg-gray-900 text-green-400 font-mono min-h-screen flex flex-col p-4 md:p-8';
+                                addOutput("Theme set to: Dark", false);
+                                break;
+                            case 'light':
+                                document.body.className = 'bg-gray-100 text-green-800 font-mono min-h-screen flex flex-col p-4 md:p-8';
+                                addOutput("Theme set to: Light", false);
+                                break;
+                            case 'cyberpunk':
+                                document.body.className = 'bg-indigo-900 text-pink-400 font-mono min-h-screen flex flex-col p-4 md:p-8';
+                                addOutput("Theme set to: Cyberpunk", false);
+                                break;
+                            case 'matrix':
+                                document.body.className = 'bg-black text-green-500 font-mono min-h-screen flex flex-col p-4 md:p-8';
+                                addOutput("Theme set to: Matrix", false);
+                                break;
+                            default:
+                                addOutput("Invalid theme. Available themes: dark, light, cyberpunk, matrix", false);
+                        }
                     }
                 }
             };
-            
-            // Handle command submission
+
+            // Execute command
+            function executeCommand(input) {
+                if (!input.trim()) return;
+                
+                const parts = input.split(' ');
+                const cmd = parts[0].toLowerCase();
+                const args = parts.slice(1);
+                
+                // Add command to history
+                addOutput(`<span class="text-green-500">$</span> <span class="text-green-300">${input}</span>`, true);
+                
+                // Execute command if exists
+                if (commands[cmd]) {
+                    commands[cmd].execute(args);
+                } else {
+                    addOutput(`<span class="text-red-400">Command not found: ${cmd}. Type 'help' for available commands.</span>`, false);
+                }
+                
+                // Scroll to bottom
+                commandHistory.scrollTop = commandHistory.scrollHeight;
+            }
+
+            // Add output to terminal
+            function addOutput(content, isCommand) {
+                const outputLine = document.createElement('div');
+                outputLine.className = isCommand ? 'mb-1' : 'mb-2';
+                outputLine.innerHTML = content;
+                commandHistory.appendChild(outputLine);
+            }
+
+            // Handle command input
             commandInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
-                    const commandText = commandInput.value.trim();
-                    if (commandText) {
-                        executeCommand(commandText);
+                    const input = commandInput.value.trim();
+                    if (input) {
+                        executeCommand(input);
                         commandInput.value = '';
                     }
                 }
             });
-            
-            // Execute command function
-            function executeCommand(input) {
-                const args = input.split(' ');
-                const cmd = args[0].toLowerCase();
-                
-                addOutput(`<span class="prompt">$</span> <span class="command">${input}</span>`, true);
-                
-                if (commands[cmd]) {
-                    commands[cmd].execute();
-                } else {
-                    addOutput(`<span class="error">Command not found: ${cmd}. Type 'help' for available commands.</span>`, false);
-                }
-                
-                // Auto-scroll to bottom
-                commandHistory.scrollTop = commandHistory.scrollHeight;
-            }
-            
-            // Add output to terminal
-            function addOutput(text, isCommand) {
-                const outputLine = document.createElement('div');
-                outputLine.className = 'output-line';
-                outputLine.innerHTML = text;
-                
-                commandHistory.appendChild(outputLine);
-            }
-            
-            // Initial help command
+
+            // Show help on startup
             commands.help.execute();
             
-            // Show quick links on mobile by default
+            // Show links on mobile by default
             if (window.innerWidth <= 768) {
                 quickLinks.classList.remove('hidden');
             }
         });
     </script>
-<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <a href="https://enzostvs-deepsite.hf.space" style="color: #fff;" target="_blank" >DeepSite</a> <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;"></p></body>
+</body>
 </html>
