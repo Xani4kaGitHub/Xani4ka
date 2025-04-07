@@ -3,63 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Terminal Landing</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #00ff00;
-            --secondary-color: #00cc88;
-            --bg-color: #0a0a0a;
+            --bg-color: #121212;
             --text-color: #e0e0e0;
+            --accent-color: #64ffda;
+            --cursor-color: #ffffff;
+            --prompt-color: #4CAF50;
+            --error-color: #ff5252;
+            --input-bg: #1e1e1e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Fira Code', monospace;
             background-color: var(--bg-color);
-            color: var(--primary-color);
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow-x: hidden;
-        }
-        
-        .terminal {
-            padding: 1rem;
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            line-height: 1.6;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            padding: 1rem;
+            overflow: hidden;
+        }
+        
+        .terminal-container {
+            flex-grow: 1;
+            background-color: var(--input-bg);
+            border-radius: 4px;
+            padding: 2rem;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
         
         .terminal-header {
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--secondary-color);
-            padding-bottom: 0.5rem;
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+            user-select: none;
         }
         
-        .terminal-body {
-            flex-grow: 1;
-            overflow-y: auto;
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .btn-red { background-color: #ff5f56; }
+        .btn-yellow { background-color: #ffbd2e; }
+        .btn-green { background-color: #27c93f; }
+        
+        .terminal-output {
             margin-bottom: 1rem;
         }
         
-        .terminal-input-container {
+        .prompt {
+            color: var(--prompt-color);
+            margin-right: 0.5rem;
+        }
+        
+        .command {
+            color: var(--accent-color);
+        }
+        
+        .error {
+            color: var(--error-color);
+        }
+        
+        .terminal-input {
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
         }
         
-        .prompt {
-            color: var(--secondary-color);
-            margin-right: 0.5rem;
+        #command-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            padding: 0.2rem;
+            caret-color: var(--cursor-color);
+        }
+        
+        #command-input:focus {
+            outline: none;
         }
         
         .cursor {
             display: inline-block;
             width: 10px;
             height: 20px;
-            background-color: var(--primary-color);
+            background-color: var(--cursor-color);
+            margin-left: 2px;
             animation: blink 1s infinite;
             vertical-align: middle;
         }
@@ -69,349 +115,183 @@
             50% { opacity: 0; }
         }
         
-        .command {
-            color: var(--primary-color);
-        }
-        
-        .output {
-            color: var(--text-color);
-            white-space: pre-wrap;
-            margin-bottom: 1rem;
-        }
-        
-        .error {
-            color: #ff5555;
-        }
-        
-        .success {
-            color: var(--secondary-color);
-        }
-        
-        .link {
-            color: #55aaff;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        
-        .link:hover {
-            color: #88ccff;
-        }
-        
         .hidden {
             display: none;
         }
         
-        .links-panel {
-            position: fixed;
-            bottom: 60px;
-            right: 20px;
-            background-color: rgba(10, 10, 10, 0.9);
-            border: 1px solid var(--secondary-color);
-            padding: 1rem;
-            border-radius: 5px;
-            z-index: 100;
+        .links {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
         
-        .link-icon {
-            font-size: 2rem;
-            margin: 0 0.5rem;
-            color: var(--secondary-color);
-            transition: all 0.3s;
+        .link {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
-        .link-icon:hover {
-            color: var(--primary-color);
-            transform: scale(1.2);
+        .link:hover {
+            color: var(--text-color);
+            text-decoration: underline;
         }
         
-        .project-item {
-            margin-bottom: 1rem;
-            padding-left: 1rem;
-            border-left: 2px solid var(--secondary-color);
-        }
-        
-        .project-title {
-            color: var(--secondary-color);
-            font-weight: bold;
-        }
-        
-        .project-year {
-            color: #888;
-        }
-        
-        .typing-animation {
-            overflow: hidden;
-            border-right: 2px solid var(--primary-color);
-            white-space: nowrap;
-            margin: 0 auto;
-            letter-spacing: 0.15em;
-        }
-        
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .terminal {
+            body {
                 padding: 0.5rem;
             }
-            
-            .links-panel {
-                bottom: 50px;
-                right: 10px;
-                padding: 0.5rem;
-            }
-            
-            .link-icon {
-                font-size: 1.5rem;
+            .terminal-container {
+                padding: 1rem;
             }
         }
     </style>
 </head>
-<body class="bg-black text-green-500 font-mono">
-    <div class="terminal">
+<body>
+    <div class="terminal-container">
         <div class="terminal-header">
-            <div class="typing-animation" id="welcome-message"></div>
+            <div class="terminal-btn btn-red"></div>
+            <div class="terminal-btn btn-yellow"></div>
+            <div class="terminal-btn btn-green"></div>
+            <span>terminal</span>
         </div>
         
-        <div class="terminal-body" id="terminal-output">
-            <div class="output">
-                Welcome to my interactive terminal portfolio!
-                <br>Type <span class="command">help</span> to see available commands.
-                <br><br>
+        <div class="terminal-output">
+            <div class="output-line"><span class="prompt">$</span> <span class="command">welcome</span> --user=guest</div>
+            <div class="output-line">
+                <pre style="font-family: inherit;">
+  _____               _ _             
+ |_   _| __ _   _ ___(_|_) ___  _ __  
+   | || '__| | | / __| | |/ _ \| '_ \ 
+   | || |  | |_| \__ \ | | (_) | | | |
+   |_||_|   \__,_|___/_|_|\___/|_| |_|
+                </pre>
             </div>
+            <div class="output-line">Welcome to my terminal-style landing page. Type <span class="command">help</span> to see available commands.</div>
         </div>
         
-        <div class="terminal-input-container">
-            <span class="prompt">user@portfolio:~$</span>
-            <input type="text" id="terminal-input" class="flex-grow bg-transparent border-none outline-none text-green-500" autofocus>
-            <span class="cursor" id="input-cursor"></span>
+        <div id="command-history"></div>
+        
+        <div class="terminal-input">
+            <span class="prompt">$</span>
+            <input type="text" id="command-input" autocomplete="off" autofocus>
+            <span class="cursor"></span>
+        </div>
+        
+        <div class="links hidden" id="quick-links">
+            <a href="#about" class="link" onclick="executeCommand('about')"><i class="fas fa-user"></i> about</a>
+            <a href="#projects" class="link" onclick="executeCommand('projects')"><i class="fas fa-code"></i> projects</a>
+            <a href="#contact" class="link" onclick="executeCommand('contact')"><i class="fas fa-envelope"></i> contact</a>
+            <a href="https://github.com" target="_blank" class="link"><i class="fab fa-github"></i> github</a>
+            <a href="https://linkedin.com" target="_blank" class="link"><i class="fab fa-linkedin"></i> linkedin</a>
         </div>
     </div>
-    
-    <div class="links-panel hidden" id="links-panel">
-        <a href="https://github.com" target="_blank" class="link-icon"><i class="fab fa-github"></i></a>
-        <a href="https://linkedin.com" target="_blank" class="link-icon"><i class="fab fa-linkedin"></i></a>
-        <a href="https://twitter.com" target="_blank" class="link-icon"><i class="fab fa-twitter"></i></a>
-        <a href="mailto:contact@example.com" class="link-icon"><i class="fas fa-envelope"></i></a>
-    </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // DOM elements
-            const terminalInput = document.getElementById('terminal-input');
-            const terminalOutput = document.getElementById('terminal-output');
-            const cursor = document.getElementById('input-cursor');
-            const welcomeMessage = document.getElementById('welcome-message');
-            const linksPanel = document.getElementById('links-panel');
+            const commandInput = document.getElementById('command-input');
+            const commandHistory = document.getElementById('command-history');
+            const quickLinks = document.getElementById('quick-links');
             
-            // Command history
-            let commandHistory = [];
-            let historyIndex = -1;
-            
-            // Projects data
-            const projects = [
-                {
-                    title: "Terminal Portfolio",
-                    year: "2023",
-                    description: "This interactive terminal-style portfolio website built with HTML, CSS, and JavaScript.",
-                    tags: ["HTML", "CSS", "JavaScript", "TailwindCSS"]
-                },
-                {
-                    title: "E-commerce Platform",
-                    year: "2022",
-                    description: "Full-stack e-commerce platform with React, Node.js, and MongoDB.",
-                    tags: ["React", "Node.js", "MongoDB", "Express"]
-                },
-                {
-                    title: "Weather Dashboard",
-                    year: "2021",
-                    description: "Real-time weather application using OpenWeatherMap API.",
-                    tags: ["JavaScript", "API", "CSS"]
-                }
-            ];
-            
-            // Welcome message typing animation
-            const welcomeText = "Hello, World! Welcome to my terminal portfolio.";
-            let i = 0;
-            const typingInterval = setInterval(() => {
-                if (i < welcomeText.length) {
-                    welcomeMessage.textContent += welcomeText.charAt(i);
-                    i++;
-                } else {
-                    clearInterval(typingInterval);
-                }
-            }, 50);
-            
-            // Terminal commands
+            // Available commands
             const commands = {
                 help: {
-                    description: "Display this help message",
-                    execute: () => {
-                        let output = "Available commands:\n\n";
-                        for (const cmd in commands) {
-                            output += `<span class="command">${cmd}</span> - ${commands[cmd].description}\n`;
-                        }
-                        return output;
+                    description: "List all available commands",
+                    execute: function() {
+                        addOutput("Available commands:", false);
+                        Object.keys(commands).forEach(cmd => {
+                            addOutput(`  <span class="command">${cmd}</span> - ${commands[cmd].description}`, false);
+                        });
                     }
                 },
                 clear: {
                     description: "Clear the terminal screen",
-                    execute: () => {
-                        terminalOutput.innerHTML = '';
-                        return '';
+                    execute: function() {
+                        commandHistory.innerHTML = '';
                     }
                 },
                 about: {
-                    description: "Display information about me",
-                    execute: () => {
-                        return `
-<span class="success">=== ABOUT ME ===</span>
-Name: John Doe
-Role: Full-Stack Developer
-Location: San Francisco, CA
-Education: B.Sc. in Computer Science
-Skills: JavaScript, Python, React, Node.js, MongoDB
-Experience: 5+ years in web development
-`;
+                    description: "Show information about me",
+                    execute: function() {
+                        addOutput(`<span class="command">about</span>`, true);
+                        addOutput("I'm a passionate developer creating digital experiences.", false);
+                        addOutput("Specialized in web technologies with a focus on clean, efficient code.", false);
                     }
                 },
                 projects: {
-                    description: "List my projects",
-                    execute: () => {
-                        let output = '<span class="success">=== MY PROJECTS ===</span>\n\n';
-                        projects.forEach(project => {
-                            output += `
-<div class="project-item">
-    <div class="project-title">${project.title} <span class="project-year">(${project.year})</span></div>
-    <div>${project.description}</div>
-    <div>Tags: ${project.tags.join(', ')}</div>
-</div>
-`;
-                        });
-                        return output;
+                    description: "Show my projects",
+                    execute: function() {
+                        addOutput(`<span class="command">projects</span>`, true);
+                        addOutput("1. Terminal Portfolio - A unique CLI-style portfolio", false);
+                        addOutput("2. Data Visualization Dashboard - Interactive analytics tool", false);
+                        addOutput("3. E-commerce Platform - Full-stack online store solution", false);
                     }
                 },
                 contact: {
                     description: "Show contact information",
-                    execute: () => {
-                        return `
-<span class="success">=== CONTACT ===</span>
-Email: <span class="link">contact@example.com</span>
-GitHub: <span class="link">github.com/johndoe</span>
-LinkedIn: <span class="link">linkedin.com/in/johndoe</span>
-Twitter: <span class="link">@johndoe</span>
-`;
+                    execute: function() {
+                        addOutput(`<span class="command">contact</span>`, true);
+                        addOutput("Email: hello@example.com", false);
+                        addOutput("Twitter: @username", false);
                     }
                 },
                 links: {
-                    description: "Toggle quick links panel",
-                    execute: () => {
-                        linksPanel.classList.toggle('hidden');
-                        return 'Quick links panel toggled.';
-                    }
-                },
-                sudo: {
-                    description: "Superuser command (just for fun)",
-                    execute: () => {
-                        return `
-<span class="error">sudo: you are not in the sudoers file. This incident will be reported.</span>
-
-<span class="success">Nice try! Here's a cookie instead:</span>
-   ____
-  /    \\
- |  O  O|
- |  __  |
-  \\____/
-`;
+                    description: "Toggle quick navigation links",
+                    execute: function() {
+                        quickLinks.classList.toggle('hidden');
                     }
                 }
             };
             
-            // Handle command execution
-            function executeCommand(command) {
-                if (!command.trim()) return '';
+            // Handle command submission
+            commandInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    const commandText = commandInput.value.trim();
+                    if (commandText) {
+                        executeCommand(commandText);
+                        commandInput.value = '';
+                    }
+                }
+            });
+            
+            // Execute command function
+            function executeCommand(input) {
+                const args = input.split(' ');
+                const cmd = args[0].toLowerCase();
                 
-                // Add command to history
-                commandHistory.push(command);
-                historyIndex = commandHistory.length;
-                
-                // Display command in terminal
-                const commandElement = document.createElement('div');
-                commandElement.innerHTML = `<span class="prompt">user@portfolio:~$</span> <span class="command">${command}</span>`;
-                terminalOutput.appendChild(commandElement);
-                
-                // Process command
-                let output = '';
-                const cmd = command.split(' ')[0].toLowerCase();
+                addOutput(`<span class="prompt">$</span> <span class="command">${input}</span>`, true);
                 
                 if (commands[cmd]) {
-                    output = commands[cmd].execute();
+                    commands[cmd].execute();
                 } else {
-                    output = `<span class="error">Error: Command "${command}" not found. Type "help" for available commands.</span>`;
+                    addOutput(`<span class="error">Command not found: ${cmd}. Type 'help' for available commands.</span>`, false);
                 }
                 
-                // Display output
-                if (output) {
-                    const outputElement = document.createElement('div');
-                    outputElement.className = 'output';
-                    outputElement.innerHTML = output;
-                    terminalOutput.appendChild(outputElement);
-                }
-                
-                // Scroll to bottom
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                
-                return output;
+                // Auto-scroll to bottom
+                commandHistory.scrollTop = commandHistory.scrollHeight;
             }
             
-            // Handle input events
-            terminalInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    const command = terminalInput.value;
-                    terminalInput.value = '';
-                    executeCommand(command);
-                } else if (e.key === 'ArrowUp') {
-                    // Navigate command history up
-                    if (commandHistory.length > 0 && historyIndex > 0) {
-                        historyIndex--;
-                        terminalInput.value = commandHistory[historyIndex];
-                    }
-                    e.preventDefault();
-                } else if (e.key === 'ArrowDown') {
-                    // Navigate command history down
-                    if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
-                        historyIndex++;
-                        terminalInput.value = commandHistory[historyIndex];
-                    } else {
-                        historyIndex = commandHistory.length;
-                        terminalInput.value = '';
-                    }
-                    e.preventDefault();
-                } else if (e.key === 'Tab') {
-                    // Auto-completion
-                    e.preventDefault();
-                    const input = terminalInput.value.toLowerCase();
-                    if (!input) return;
-                    
-                    const matchingCommands = Object.keys(commands).filter(cmd => 
-                        cmd.startsWith(input)
-                    );
-                    
-                    if (matchingCommands.length === 1) {
-                        terminalInput.value = matchingCommands[0];
-                    } else if (matchingCommands.length > 1) {
-                        executeCommand('help');
-                        terminalOutput.innerHTML += `<div class="output">Possible completions: ${matchingCommands.join(', ')}</div>`;
-                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                    }
-                }
-            });
+            // Add output to terminal
+            function addOutput(text, isCommand) {
+                const outputLine = document.createElement('div');
+                outputLine.className = 'output-line';
+                outputLine.innerHTML = text;
+                
+                commandHistory.appendChild(outputLine);
+            }
             
-            // Focus input on click anywhere
-            document.addEventListener('click', function() {
-                terminalInput.focus();
-            });
+            // Initial help command
+            commands.help.execute();
             
-            // Initial focus
-            terminalInput.focus();
+            // Show quick links on mobile by default
+            if (window.innerWidth <= 768) {
+                quickLinks.classList.remove('hidden');
+            }
         });
     </script>
-</body>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <a href="https://enzostvs-deepsite.hf.space" style="color: #fff;" target="_blank" >DeepSite</a> <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;"></p></body>
 </html>
