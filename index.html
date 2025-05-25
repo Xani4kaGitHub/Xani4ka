@@ -16,8 +16,8 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            background: linear-gradient(45deg, #1a1a1a, #2c3e50);
-            color: white;
+            background-color: #000;
+            color: #fff;
         }
 
         .background-animation {
@@ -52,19 +52,21 @@
 
         .nav-btn {
             padding: 12px 25px;
-            background: linear-gradient(45deg, #3498db, #8e44ad);
-            border: none;
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
             border-radius: 30px;
-            color: white;
             cursor: pointer;
             font-size: 16px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
         .nav-btn:hover {
+            background: #fff;
+            color: #000;
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
         }
 
         .content-container {
@@ -82,7 +84,7 @@
             height: calc(100vh - 120px);
             border: none;
             border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
         }
     </style>
@@ -91,8 +93,8 @@
     <div class="background-animation" id="particles"></div>
     
     <div class="nav-buttons">
-        <button class="nav-btn" onclick="loadContent('page1.html')">Страница 1</button>
-        <button class="nav-btn" onclick="loadContent('page2.html')">Страница 2</button>
+        <button class="nav-btn" onclick="loadContent('page1.html')">Био</button>
+        <button class="nav-btn" onclick="loadContent('page2.html')">хз</button>
         <button class="nav-btn" onclick="loadContent('page3.html')">Страница 3</button>
     </div>
 
@@ -101,7 +103,6 @@
     </div>
 
     <script>
-        // Создание анимированного фона
         function createParticles() {
             const particles = document.getElementById('particles');
             for (let i = 0; i < 50; i++) {
@@ -117,7 +118,6 @@
         }
         createParticles();
 
-        // Загрузка контента
         function loadContent(url) {
             const frame = document.getElementById('frame');
             frame.style.opacity = 0;
