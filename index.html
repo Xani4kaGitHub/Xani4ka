@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Переключение страниц</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+    <nav class="navbar">
+      <button onclick="loadPage('page1.html')">Страница 1</button>
+      <button onclick="loadPage('page2.html')">Страница 2</button>
+      <button onclick="loadPage('page3.html')">Страница 3</button>
+    </nav>
+
+    <main id="content" class="content">
+      <p class="placeholder">Нажми на кнопку, чтобы загрузить страницу</p>
+    </main>
+  </div>
+
+  <script>
+    async function loadPage(page) {
+      const content = document.getElementById('content');
+      content.classList.add('fade-out');
+      try {
+        const response = await fetch(page);
+        if (!response.ok) throw new Error('Ошибка загрузки');
+        const html = await response.text();
+        setTimeout(() => {
+          content.innerHTML = html;
+          content.classList.remove('fade-out');
+          content.classList.add('fade-in');
+          setTimeout(() => content.classList.remove('fade-in'), 300);
+        }, 300);
+      } catch (err) {
+        content.innerHTML = '<p class="error">Не удалось загрузить страницу.</p>';
+        content.classList.remove('fade-out');
+      }
+    }
+  </script>
+
+</body>
+</html>
