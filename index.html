@@ -1,29 +1,131 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Хани Хом</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Крутой Сайт</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background: linear-gradient(45deg, #1a1a1a, #2c3e50);
+            color: white;
+        }
+
+        .background-animation {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0) scale(0); }
+            50% { transform: translateY(-100vh) translateX(100vw) scale(1); }
+            100% { transform: translateY(0) translateX(0) scale(0); }
+        }
+
+        .nav-buttons {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #3498db, #8e44ad);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .content-container {
+            padding: 100px 20px 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        iframe {
+            width: 100%;
+            height: calc(100vh - 120px);
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+    </style>
 </head>
 <body>
+    <div class="background-animation" id="particles"></div>
+    
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="loadContent('page1.html')">Страница 1</button>
+        <button class="nav-btn" onclick="loadContent('page2.html')">Страница 2</button>
+        <button class="nav-btn" onclick="loadContent('page3.html')">Страница 3</button>
+    </div>
 
-  <div class="sidebar">
-    <h1>Меню</h1>
-    <button onclick="loadPage('page1.html')">Страница 1</button>
-    <button onclick="loadPage('page2.html')">Страница 2</button>
-    <button onclick="loadPage('page3.html')">Страница 3</button>
-  </div>
+    <div class="content-container" id="content">
+        <iframe id="frame" src="page1.html"></iframe>
+    </div>
 
-  <div class="main">
-    <iframe id="viewer" src="" frameborder="0"></iframe>
-  </div>
+    <script>
+        // Создание анимированного фона
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = Math.random() * 100 + 'vh';
+                particle.style.width = particle.style.height = 
+                    Math.random() * 20 + 10 + 'px';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particles.appendChild(particle);
+            }
+        }
+        createParticles();
 
-  <script>
-    function loadPage(page) {
-      document.getElementById('viewer').src = page;
-    }
-  </script>
-
+        // Загрузка контента
+        function loadContent(url) {
+            const frame = document.getElementById('frame');
+            frame.style.opacity = 0;
+            setTimeout(() => {
+                frame.src = url;
+                frame.style.opacity = 1;
+            }, 300);
+        }
+    </script>
 </body>
 </html>
