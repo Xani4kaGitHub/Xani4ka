@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Хани молодец</title>
+  <title>xani4ka молодец</title>
   <style>
     body {
       font-family: sans-serif;
@@ -10,31 +10,71 @@
       color: #fff;
       padding: 20px;
     }
+
     textarea {
       width: 100%;
       height: 150px;
-      background: #2e2e2e;
+      background: #2b2b2b;
       color: #fff;
       font-family: monospace;
-      padding: 10px;
+      padding: 12px 14px;
       border: none;
-      resize: vertical;
-    }
-    #output {
-      margin-top: 20px;
-      padding: 15px;
-      background: #2a2a2a;
       border-radius: 10px;
-      font-size: 20px;
+      resize: vertical;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    #output-wrapper {
+      margin-top: 20px;
+      background: #2b2b2b;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .output-line {
+      display: flex;
+      align-items: flex-start;
       white-space: pre-wrap;
       word-break: break-word;
+      font-size: 18px;
+      margin-bottom: 4px;
+      font-family: monospace;
     }
+
+    .output-line-number {
+      width: 40px;
+      text-align: right;
+      color: #666;
+      user-select: none;
+      padding-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .output-line-text {
+      flex-grow: 1;
+    }
+
     .bold { font-weight: bold; }
     .italic { font-style: italic; }
     .underline { text-decoration: underline; }
 
+    button {
+      margin-top: 20px;
+      padding: 8px 16px;
+      background: #3a3a3a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #4a4a4a;
+    }
+
     footer {
-      margin-top: 40px;
+      margin-top: 30px;
       text-align: center;
       color: #aaa;
       font-size: 14px;
@@ -42,83 +82,155 @@
   </style>
 </head>
 <body>
-  <h1>Просмотр RGB Текста Minecraft</h1>
-  <p>Вставь сюда текст с §, & или &# цветами:</p>
-  <textarea id="input" placeholder="Вставь форматированный текст здесь..."></textarea>
-  <div id="output"></div>
+  <h1>Проверка Minecraft-стиля текста</h1>
+  <textarea id="input" placeholder="Вставь текст с & или §..."></textarea>
 
-  <footer>
-    created by Xani4ka
-  </footer>
+  <div id="output-wrapper">
+    <div id="output"></div>
+  </div>
+
+  <button onclick="toggleLineNumbers()">Отключить номера строк</button>
+
+  <footer>hosted by Xani4ka</footer>
 
   <script>
+    const mcColors = {
+      '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+      '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
+      '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
+      'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF',
+    };
+    const formatCodes = {
+      'l': 'bold',
+      'n': 'underline',
+      'o': 'italic',
+      'r': 'reset'
+    };
+
     const input = document.getElementById('input');
     const output = document.getElementById('output');
+    let showLineNumbers = true;
+
+    input.addEventListener('input', updateOutput);
+
+    function updateOutput() {
+      const lines = input.value.split('\n');
+      output.innerHTML = '';
+
+      lines.forEach((line, i) => {
+        const parsed = parseLine(line);
+
+        const div = document.createElement('div');
+        div.className = 'output-line';
+
+        if (showLineNumbers) {
+          const num = document.createElement('div');
+          num.className = 'output-line-number';
+          num.textContent = i + 1;
+          div.appendChild(num);
+        }
+
+        const text = document.createElement('div');
+        text.className = 'output-line-text';
+        text.innerHTML = parsed;
+
+        div.appendChild(text);
+        output.appendChild(div);
+      });
+    }
 
     function parseLine(text) {
-      const formatting = {
-        'l': 'bold',
-        'o': 'italic',
-        'n': 'underline',
-        'r': 'reset'
-      };
+      text = applyCustomTags(text);
+      text = text.replace(/§/g, '&');
 
-      const hexChar = /(?:§x(?:§[0-9A-Fa-f]){6})|(?:&x(?:&[0-9A-Fa-f]){6})|(?:&#[0-9A-Fa-f]{6})/g;
-      const simpleChar = /[§&][0-9a-fk-or]/gi;
-
+      const regex = /(&[0-9a-fklmnor])|(&x((&[0-9a-fA-F]){6}))|(&#([0-9a-fA-F]{6}))/gi;
       let result = '';
-      let index = 0;
-      let currentColor = '';
       let classes = [];
+      let color = '';
+      let index = 0;
 
-      function wrap(content) {
-        return `<span style="${currentColor ? `color:${currentColor};` : ''}" class="${classes.join(' ')}">${content}</span>`;
-      }
-
-      const matches = [...text.matchAll(new RegExp(`${hexChar.source}|${simpleChar.source}`, 'g'))];
-
-      for (let i = 0; i < matches.length; i++) {
-        const match = matches[i];
-        const start = match.index;
-        const end = match.index + match[0].length;
-
+      const matches = [...text.matchAll(regex)];
+      for (let match of matches) {
+        let start = match.index;
+        let end = match.index + match[0].length;
         if (index < start) {
-          result += wrap(text.slice(index, start));
+          result += wrap(text.slice(index, start), color, classes);
         }
 
-        const code = match[0];
-
-        if (code.startsWith('§x') || code.startsWith('&x')) {
-          const chars = code.match(/[0-9a-fA-F]/g);
-          if (chars && chars.length === 6) {
-            currentColor = '#' + chars.join('');
-          }
-        } else if (code.startsWith('&#')) {
-          currentColor = code.slice(1);
+        if (match[2]) {
+          const hex = match[0].replace(/&x/g, '').replace(/&/g, '');
+          if (hex.length === 6) color = '#' + hex;
+        } else if (match[5]) {
+          color = '#' + match[6];
         } else {
-          const char = code.slice(1).toLowerCase();
-          if (char === 'r') {
-            currentColor = '';
+          const code = match[1][1].toLowerCase();
+          if (code === 'r') {
+            color = '';
             classes = [];
-          } else if (formatting[char]) {
-            classes.push(formatting[char]);
+          } else if (formatCodes[code]) {
+            if (!classes.includes(formatCodes[code])) {
+              classes.push(formatCodes[code]);
+            }
+          } else if (mcColors[code]) {
+            color = mcColors[code];
           }
         }
-
         index = end;
       }
 
       if (index < text.length) {
-        result += wrap(text.slice(index));
+        result += wrap(text.slice(index), color, classes);
       }
 
       return result;
     }
 
-    input.addEventListener('input', () => {
-      const lines = input.value.split('\n');
-      output.innerHTML = lines.map(line => parseLine(line)).join('<br>');
-    });
+    function wrap(text, color, classes) {
+      if (!text) return '';
+      let style = color ? `color:${color};` : '';
+      let classAttr = classes.length ? `class="${classes.join(' ')}"` : '';
+      return `<span style="${style}" ${classAttr}>${text}</span>`;
+    }
+
+    function applyCustomTags(text) {
+      text = text.replace(/<#[0-9a-fA-F]{6}>(.*?)<\/#[0-9a-fA-F]{6}>/gs, (_, content) => {
+        const hex = /<#[0-9a-fA-F]{6}>/.exec(_)[0].slice(1, -1);
+        return `<span style="color:${hex}">${content}</span>`;
+      });
+
+      text = text.replace(/<#[0-9a-fA-F]{6}>/g, (m) => {
+        const hex = m.slice(1, -1);
+        return `<span style="color:${hex}">`;
+      });
+
+      text = text.replace(/<([a-z]+)>(.*?)<\/\1>/gi, (_, tag, content) => {
+        if (['bold', 'italic', 'underline'].includes(tag.toLowerCase())) {
+          return `<span class="${tag.toLowerCase()}">${content}</span>`;
+        } else {
+          return `<span style="color:${tag.toLowerCase()}">${content}</span>`;
+        }
+      });
+
+      text = text.replace(/<([a-z]+)>/gi, (_, tag) => {
+        if (['bold', 'italic', 'underline'].includes(tag.toLowerCase())) {
+          return `<span class="${tag.toLowerCase()}">`;
+        } else {
+          return `<span style="color:${tag.toLowerCase()}">`;
+        }
+      });
+
+      const openTags = (text.match(/<span/g) || []).length;
+      const closeTags = (text.match(/<\/span>/g) || []).length;
+      return text + '</span>'.repeat(openTags - closeTags);
+    }
+
+    function toggleLineNumbers() {
+      showLineNumbers = !showLineNumbers;
+      updateOutput();
+      event.target.innerText = showLineNumbers ? "Отключить номера строк" : "Включить номера строк";
+    }
+
+    updateOutput();
   </script>
 </body>
 </html>
