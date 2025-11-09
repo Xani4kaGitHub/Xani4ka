@@ -73,6 +73,64 @@
       background: #4a4a4a;
     }
 
+    .mode-switch {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .mode-button {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .mode-button.active {
+      background: #5c5cff;
+      color: #fff;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #symbols-panel {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .symbol-category {
+      background: #252525;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .symbol-category-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .symbol-copy-btn {
+      padding: 6px 12px;
+      margin-top: 0;
+      font-size: 14px;
+      background: #444;
+    }
+
+    .symbol-text {
+      font-size: 20px;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
     footer {
       margin-top: 30px;
       text-align: center;
@@ -82,18 +140,36 @@
   </style>
 </head>
 <body>
-  <h1>Проверка Minecraft-стиля текста</h1>
+  <h1>ТГК: HomeXani</h1>
+
+  <div class="mode-switch">
+    <button class="mode-button active" data-mode="minecraft" onclick="setMode('minecraft')">Проверка Minecraft-стиля текста</button>
+    <button class="mode-button" data-mode="tiny" onclick="setMode('tiny')">Генератор маленьких букв</button>
+    <button class="mode-button" data-mode="symbols" onclick="setMode('symbols')">Коллекция символов</button>
+  </div>
+
   <textarea id="input" placeholder="Вставь текст с & или §..."></textarea>
 
   <div id="output-wrapper">
     <div id="output"></div>
+    <div id="symbols-panel" class="hidden"></div>
   </div>
 
-  <button onclick="toggleLineNumbers()">Отключить номера строк</button>
+  <button id="line-toggle" onclick="toggleLineNumbers(event)">Отключить номера строк</button>
 
   <footer>hosted by Xani4ka</footer>
 
   <script>
+    const tinyLetters = {
+      'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ꜰ',
+      'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ',
+      'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ',
+      's': 'ꜱ', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x',
+      'y': 'ʏ', 'z': 'ᴢ',
+      'а': 'ᴀ', 'в': 'ʙ', 'е': 'ᴇ', 'к': 'ᴋ', 'н': 'ʜ', 'о': 'ᴏ',
+      'р': 'ᴘ', 'с': 'ᴄ', 'у': 'ʏ', 'х': 'x', 'ф': 'ȹ'
+    };
+
     const mcColors = {
       '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
       '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
@@ -109,21 +185,117 @@
 
     const input = document.getElementById('input');
     const output = document.getElementById('output');
+    const lineToggleButton = document.getElementById('line-toggle');
+    const symbolsPanel = document.getElementById('symbols-panel');
+    const symbolCategories = [
+      { title: '❤️ Эмоции, любовь, символы чувств', symbols: '❤ ❥ ღ ❣ ♥ ♡ ❧ ❦ 💖 💘 💝 💞 💓 💗 💕 💔 💌 💟' },
+      { title: '✨ Украшения, блеск, звёзды', symbols: '★ ☆ ✮ ✯ ✰ ✩ ✪ ✫ ✬ ✭ ✮ ✯ ✰ ✱ ✲ ✳ ✴ ✵ ✶ ✷ ✸ ✹ ✺ ✻ ✼ ✽ ✾ ✿ ❀ ❁ ❃ ❂ ❇ ❈ ❉ ❊ ❋ ✡ ✢ ✣ ✤ ✥ ✦ ✧ ✨ ❂ ⋆' },
+      { title: '🌦 Природа, погода и сезоны', symbols: '☀ ☁ ☂ ☃ ❄ ❅ ❆ ❇ ☔ ☄ ☼ ☾ ☽ ⚡ ⚛' },
+      { title: '⚠️ Предупреждения и опасность', symbols: '⚠ ☣ ☢ ☠ ⚔ ⚒ ⚖ ⚙ ⚜ ⚑ ⚐ ⚰ ⚱ ⚕ ☤ ☯ ☭' },
+      { title: '♟ Игры, карты и шахматы', symbols: '♔ ♕ ♖ ♗ ♘ ♙ ♚ ♛ ♜ ♝ ♞ ♟ ♠ ♣ ♦ ♤ ♧ ♢ ♡ ♥' },
+      { title: '➡️ Стрелки и направления', symbols: '⬆ ⬇ ⬅ ➡ ↔ ↕ ↖ ↗ ↘ ↙ ⇐ ⇒ ⇑ ⇓ ⇔ ➞ ➜ ➝ ➤ ➥ ➦ ➧ ➨ ➩ ➪ ➫ ➬ ➭ ➮ ➯ ➱ ➲ ➳ ➴ ➵ ➶ ➷ ➸ ➹ ➺ ➻ ➼ ➽ ➾ ➚ ➘ ➟ ➢ ➣' },
+      { title: '🧭 Символы навигации и курсора', symbols: '☚ ☛ ☜ ☞ ☝ ☟' },
+      { title: '✏️ Письмо, офис, инструменты', symbols: '✎ ✏ ✐ ✑ ✒ ✍ ✉ ✆ ☎ ✄ ✂ ✚ ✜ ✛ ✠ ✞ ✟ ✎' },
+      { title: '🎵 Музыка и ноты', symbols: '♩ ♪ ♫ ♬ ♭ ♮ ♯ ♩♪♫♬' },
+      { title: '🔢 Цифры в кружках', symbols: '➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ➊ ➋ ➌ ➍ ➎ ➏ ➐ ➑ ➒ ➓' },
+      { title: '🔤 Буквы в кружках', symbols: 'ⓐ ⓑ ⓒ ⓓ ⓔ ⓕ ⓖ ⓗ ⓘ ⓙ ⓚ ⓛ ⓜ ⓝ ⓞ ⓟ ⓠ ⓡ ⓢ ⓣ ⓤ ⓥ ⓦ ⓧ ⓨ ⓩ Ⓜ' },
+      { title: '♋ Знаки зодиака и астрология', symbols: '♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓' },
+      { title: '🧱 Блоки и прямоугольники', symbols: '■ □ ▢ ▣ ▤ ▥ ▦ ▧ ▨ ▩ ▪ ▫ ▬ ▭ ▮ ▯ ▰ ▱ ▉ ▊ ▋ ▌ ▍ ▎ ▏ ▂ ▃ ▄ ▅ ▆ ▇ █ ▀ ▄ ▆ ▉ ▌' },
+      { title: '⚫ Геометрические фигуры и круги', symbols: '○ ● ◯ ◉ ◎ ◍ ◌ ◐ ◑ ◒ ◓ ◔ ◕ ◖ ◗ ◙ ◘ ◚ ◛' },
+      { title: '🔺 Треугольники и указатели', symbols: '▲ △ ▴ ▵ ▼ ▽ ▾ ▿ ▶ ▷ ▸ ▹ ◀ ◁ ◂ ◃ ► ▻ ◄ ◅ ▸ ▹' },
+      { title: '⬛ Фигуры и полигоны', symbols: '◆ ◇ ◈ ◊ ◉ ◍ ◐ ◑ ◒ ◓ ◔ ◕ ◖ ◗ ◙ ◚ ◛ ◜ ◝ ◞ ◟ ◠ ◡' },
+      { title: '♻ Символы повторения и экологии', symbols: '♺ ♻ ♽ ♼' },
+      { title: '🕹 Технические элементы', symbols: '⚙ ⚙️ ⚖ ⚒ ⚔ ⚗ ⚗️ ⚛ ⚙' },
+      { title: '🕒 Время и устройства', symbols: '⌚ ⌛ ⏳ ⏰ ⌨ ⌘' },
+      { title: '💬 Коммуникация и указатели', symbols: '☏ ☎ ✆ ☜ ☞ ☝ ☟ ✉' },
+      { title: '🧮 Математические и логические основы (частично)', symbols: '± × ÷ ∓ − + ∑ √ ∞ ≈ ≠ ≥ ≤' },
+      { title: '⚙ Линии и рамки (базовые)', symbols: '─ ━ │ ┃ ┄ ┅ ┆ ┇ ┈ ┉ ┊ ┋ ┌ ┍ ┎ ┏ ┐ ┑ ┒ ┓ └ ┕ ┖ ┗ ┘ ┙ ┚ ┛ ├ ┝ ┞ ┟ ┠ ┡ ┢ ┣ ┤ ┥ ┦ ┧ ┨ ┩ ┪ ┫ ┬ ┭ ┮ ┯ ┰ ┱ ┲ ┳ ┴ ┵ ┶ ┷ ┸ ┹ ┺ ┻ ╋ ╂ ╁ ╀ ┾ ┽ ┼ ╄ ╅ ╆ ╇ ╈ ╉ ╊ ╋ ╴ ╵ ╶ ╷ ╸ ╹ ╺ ╻ ╼ ╽ ╾ ╿' },
+      { title: '📏 Прямые, черты и пунктиры', symbols: '▬ ▭ ▬ ▮ ▯ ▰ ▱ ▲ △ ▴ ▵ ▶ ▷ ▹ ► ▻ ▼ ▾ ▿ ▽' },
+      { title: '🧩 Точки, пиксели, узоры', symbols: '· • ● ⊙ ◎ ○ ◉ ◍ ◯ ◰ ◱ ◲ ◳ ◴ ◵ ◶ ◷ ◸ ◹ ◺ ◻ ◼ ◽ ◾ ◿' },
+      { title: '🔳 Блоки заливки', symbols: '░ ▒ ▓ ▤ ▥ ▦ ▧ ▨ ▩ ▪ ▫ ▬ ▭ ▮ ▯' },
+      { title: '💠 Формы и украшения', symbols: '◈ ◉ ◌ ◍ ◐ ◑ ◒ ◓ ◔ ◕ ◖ ◗ ◘ ◙ ◚ ◛ ◜ ◝ ◞ ◟' },
+      { title: '🌀 Специальные фигуры', symbols: '◣ ◤ ◥ ◢ ◦ ◯ ◉ ◎ ◌ ◍ ◍ ◎ ●' },
+      { title: '♬ Символы звука и эмоций', symbols: '♪ ♫ ♩ ♬ ♭ ♮ ♯ ☺ ☻ ☹' },
+      { title: '🔢 Математика и логика', symbols: '∂ ∇ ∆ ∑ ∏ ∫ ∬ ∭ ∮ ∯ ∰ ∱ ∲ ∳ √ ∛ ∜ ∞ ∝ ∠ ∡ ∢ ∟ ∥ ∦ ∧ ∨ ∩ ∪ ∴ ∵ ∶ ∷ ∸ ∹ ∺ ∻ ∼ ≈ ≠ ≡ ≢ ≤ ≥ ≦ ≧ ≬ ≭ ≮ ≯ ≰ ≱ ≲ ≳ ≴ ≵ ≶ ≷ ≸ ≹ ≺ ≻ ⊂ ⊃ ⊄ ⊅ ⊆ ⊇ ⊈ ⊉ ⊊ ⊋' },
+      { title: '⚙ Технические операторы и логические знаки', symbols: '⊕ ⊖ ⊗ ⊘ ⊙ ⊚ ⊛ ⊜ ⊝ ⊞ ⊟ ⊠ ⊡ ⊢ ⊣ ⊤ ⊥ ⊧ ⊨ ⊩ ⊪ ⊫ ⊬ ⊭ ⊮ ⊯ ⊰ ⊱ ⊲ ⊳ ⊴ ⊵ ⊶ ⊷ ⊸ ⊹ ⊺ ⊻ ⊼ ⊽ ⊾ ⊿' },
+      { title: '🧮 Геометрия и наборные символы', symbols: '⌒ ⌓ ⌔ ⌕ ⌖ ⌗ ⌘ ⌙ ⌚ ⌛ ⌜ ⌝ ⌞ ⌟ ⌠ ⌡ ⌢ ⌣ ⌤ ⌥ ⌦ ⌧ ⌨ 〈 〉 ⌫ ⌬ ⌭ ⌮ ⌯ ⌰ ⌱ ⌲' },
+      { title: '🔠 Алфавитные символы и греческие буквы', symbols: 'α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ σ τ υ φ χ ψ ω Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω ℓ ℏ ℊ ℋ ℌ ℍ ℎ ℐ ℑ ℒ ℓ ℜ ℝ ℂ ℚ ℤ ℕ' },
+      { title: '🧬 Символы науки и измерений', symbols: '℃ ℉ ‰ ‱ ′ ″ ‴ ‵ ‶ ‷ ‸ ∠ ∘ ⊙ ⊗ ⊕ ⊖ ∇ ∂ ∞ π Ω Ω' },
+      { title: '⚖ Право и философия', symbols: '§ ¶ ‡ † ‡ ‡ ‡ ☤ ⚖ ⚖️ ⚗ ⚙ ⚙️ ⚖' },
+      { title: '☯ Религия и философские знаки', symbols: '☥ ☦ ☧ ☨ ☩ ☫ ☬ ☪ ☮ ☯ ☸ ⚚ ✝ ✟ ✞ ✡ ✙ ✚ ✛ ✜ ✢ ✣ ✤ ✥' },
+      { title: '🧿 Мистические и эзотерические символы', symbols: '☿ ♁ ♃ ♄ ♅ ♆ ♇ ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ ☥ ☦ ☯ ☸ ☫ ☬ ☪' },
+      { title: '⚗ Химия, алхимия и наука', symbols: '⚗ ⚛ ⚡ ☢ ☣ ☠ ☤ ⚕ ☥ ⚙ ⚖ ⚗ ⚛' },
+      { title: '🧰 Разделители, черты и линии', symbols: '– — ‒ ― ‗ ⁃ ⁄ ∕ ⌿ ⌆ ⌇ ⌈ ⌉ ⌊ ⌋ ╱ ╲ ╳ ╴ ╵ ╶ ╷ ╸ ╹ ╺ ╻ ╼ ╽ ╾ ╿' },
+      { title: '🧾 Скобки и кавычки', symbols: '« » ‹ › “ ” „ „ ‘ ’ ‚ ‛ ′ ″ ‴ ❝ ❞ 「 」 『 』 【 】 〈 〉 《 》 〈 〉' },
+      { title: '🔣 Математические операторы и сравнения', symbols: '− × ÷ ± ∓ ≡ ≢ ≈ ≉ ≃ ≄ ≅ ≆ ≇ ≈ ≍ ≎ ≏ ≐ ≑ ≒ ≓ ≔ ≕ ≖ ≗ ≘ ≙ ≚ ≛ ≜' },
+      { title: '🧱 Табличные и рамочные символы', symbols: '┌ ┐ └ ┘ ├ ┤ ┬ ┴ ┼ ┻ ┷ ┱ ┲ ┳ ┴ ┵ ┶ ┷ ┸ ┹ ┺ ┻ ╋ ╂ ╁ ╀ ╄ ╅ ╆ ╇ ╈ ╉ ╊ ╋ ╒ ╓ ╔ ╕ ╖ ╗ ╘ ╙ ╚ ╛ ╜ ╝ ╞ ╟ ╠ ╡ ╢ ╣ ╤ ╥ ╦ ╧ ╨ ╩ ╪ ╫ ╬ ╭ ╮ ╯ ╰' },
+      { title: '🔳 Штриховка и текстуры', symbols: '░ ▒ ▓ ▔ ▕ ▖ ▗ ▘ ▙ ▚ ▛ ▜ ▝ ▞ ▟' },
+      { title: '🌀 Азиатские и декоративные символы', symbols: 'あ の ぃ ぱ ぃ ぢ ぱ ぴ ぬ つ 田 網 頁 設 計 簡 대 대 田 設 計 簡 큰' },
+      { title: '🀄 Восточные и редкие', symbols: '㌹ ㍱ 煱 둻 睤 楤 橱 煪 搰 浤 洳 煵' },
+      { title: '⚜ Символы власти и знаки отличия', symbols: '⚜ ⚚ ⚝ ⚞ ⚟ ⚠ ⚡ ⚢ ⚣ ⚤ ⚥ ⚦ ⚧ ⚨ ⚩' },
+      { title: '🧩 Логические и формальные символы', symbols: '∃ ∄ ∀ ∧ ∨ ∩ ∪ ∈ ∉ ∋ ∌ ⊂ ⊃ ⊄ ⊅ ⊆ ⊇ ⊈ ⊉' },
+      { title: '♻ Сравнение, объединения и пересечения', symbols: '⊊ ⊋ ⊌ ⊍ ⊎ ⊏ ⊐ ⊑ ⊒ ⊓ ⊔ ⊕ ⊖ ⊗ ⊘ ⊙ ⊚' },
+      { title: '🪄 Комбинации и операторы множеств', symbols: '⋀ ⋁ ⋂ ⋃ ⋄ ⋅ ⋆ ⋇ ⋈ ⋉ ⋊ ⋋ ⋌ ⋍ ⋎ ⋏ ⋐ ⋑ ⋒ ⋓ ⋔ ⋕ ⋖ ⋗ ⋘ ⋙ ⋚ ⋛ ⋜ ⋝ ⋞ ⋟ ⋠ ⋡ ⋢ ⋣ ⋤ ⋥ ⋦ ⋧ ⋨ ⋩ ⋪ ⋫ ⋬ ⋭ ⋮ ⋯ ⋰ ⋱ ⋲ ⋳' },
+      { title: '🖩 Специальные вычислительные символы', symbols: '⌀ ⌂ ⌁ ⌄ ⌃ ⌆ ⌇ ⌈ ⌉ ⌊ ⌋ ⌌ ⌍ ⌎ ⌏ ⌐ ⌑ ⌒ ⌓ ⌔ ⌕ ⌖ ⌗' },
+      { title: '🔍 Разное и доп. Unicode', symbols: '☇ ☈ ☉ ☊ ☋ ☌ ☍ ☎ ☏ ☎ ☚ ☛ ☜ ☞ ☝ ☟' },
+      { title: '💡 Интеллектуальные и философские', symbols: '∞ ℵ ℑ ℜ ℘ Ω Ω Ξ Γ Σ ∆' },
+      { title: '🏁 Флаги и указатели', symbols: '⚑ ⚐ ⚑ ⚐ ⚑ ⚐ 🏁 🏳 🏴' },
+      { title: '🧠 Алхимия и оккультизм', symbols: '☿ ♁ ♃ ♄ ♅ ♆ ♇ ⚗ ⚚ ☯ ⚛ ⚗' },
+      { title: '☮ Символы мира и веры', symbols: '☮ ☯ ☪ ☫ ☬ ☸ ☦ ☥ ✝ ✟ ✞ ✠' },
+      { title: '♀♂ Гендер и биология', symbols: '♂ ♀ ⚢ ⚣ ⚤ ⚥ ⚦ ⚧ ⚨ ⚩' },
+      { title: '🔣 Редкие и технические', symbols: '⍀ ⍁ ⍂ ⍃ ⍄ ⍅ ⍆ ⍇ ⍈ ⍉ ⍊ ⍋ ⍌ ⍍ ⍎ ⍏ ⍐ ⍑ ⍒ ⍓ ⍔ ⍕ ⍖ ⍗ ⍘ ⍙ ⍚' },
+      { title: '🧾 Финансовые и денежные', symbols: '₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₫ ₭ ₮ ₯ ₰ ₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₺ ₼ ₽ ₾ ₿' },
+      { title: '⚛ Символы науки и техники', symbols: '⌀ Ω ℧ µ ∆ ∇ π Σ φ ψ Ω' },
+      { title: 'Заглавные UTF-8 буквы для Minecraft', symbols: 'ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ\nⒶ Ⓑ Ⓒ Ⓓ Ⓔ Ⓕ Ⓖ Ⓗ Ⓘ Ⓙ Ⓚ Ⓛ Ⓜ Ⓝ Ⓞ Ⓟ Ⓠ Ⓡ Ⓢ Ⓣ Ⓤ Ⓥ Ⓦ Ⓧ Ⓨ Ⓩ\nᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ' },
+      { title: 'Маленькие UTF-8 буквы для Minecraft', symbols: 'ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ\n⒜ ⒝ ⒞ ⒟ ⒠ ⒡ ⒢ ⒣ ⒤ ⒥ ⒦ ⒧ ⒨ ⒩ ⒪ ⒫ ⒬ ⒭ ⒮ ⒯ ⒰ ⒱ ⒲ ⒳ ⒴ ⒵\nⓐ ⓑ ⓒ ⓓ ⓔ ⓕ ⓖ ⓗ ⓘ ⓙ ⓚ ⓛ ⓜ ⓝ ⓞ ⓟ ⓠ ⓡ ⓢ ⓣ ⓤ ⓥ ⓦ ⓧ ⓨ ⓩ' },
+      { title: 'Пустые цифры в кружке UTF-8', symbols: '⓪ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨\n⑩ ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳' },
+      { title: 'Заполненные цифры в кружке UTF-8', symbols: '❶ ❷ ❸ ❹ ❺ ❻ ❼ ❽ ❾ ❿ ⓫ ⓬ ⓭ ⓮ ⓯ ⓰ ⓱ ⓲ ⓳ ⓴ ➊ ➋ ➌ ➍ ➎ ➏ ➐ ➑ ➒ ➓' },
+      { title: 'Цифры в скобках UTF-8', symbols: '⑴ ⑵ ⑶ ⑷ ⑸ ⑹ ⑺ ⑻ ⑼ ⑽ ⑾ ⑿ ⒀ ⒁ ⒂ ⒃ ⒄ ⒅ ⒆ ⒇' },
+      { title: 'Цифры с точкой UTF-8', symbols: '⒈ ⒉ ⒊ ⒋ ⒌ ⒍ ⒎ ⒏ ⒐ ⒑ ⒒ ⒓ ⒔ ⒕ ⒖ ⒗ ⒘ ⒙ ⒚ ⒛' },
+      { title: 'Дроби UTF-8', symbols: '½ ⅓ ¼ ⅕ ⅙ ⅐ ⅛ ⅑ ⅒ ⅔ ⅖ ¾ ⅗ ⅜ ⅘ ⅚ ⅝ ⅞ ℅ ⅟ ‱' },
+      { title: 'Римские цифры UTF-8', symbols: 'Ⅰ Ⅱ Ⅲ Ⅳ Ⅴ Ⅵ Ⅶ Ⅷ Ⅸ Ⅹ Ⅺ Ⅻ Ⅼ' },
+      { title: 'Надстрочные и подстрочные цифры UTF-8', symbols: '⁰ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ ₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉' },
+      { title: 'Маленькие цифры UTF-8', symbols: '₀₁₂₃₄₅₆₇₈₉' },
+      { title: 'Математические знаки UTF-8', symbols: '⁺ ⁻ ⁼ ⁽ ⁾ ⁿ ⁱ ₊ ₋ ₌ ₍ ₎ ₐ ₑ ₒ ₓ ₔ ≤ ≥ ≦ ≧ ≨ ≩ ≮ ≯ ≰ ≱ ≲ ≳ ≴ ≵ ≡ ±' },
+      { title: 'Ромбики UTF-8', symbols: '◆ ◇ ◈ ◊ ⋄ ♦ ♢' },
+      { title: 'Звёздочки и снежинки UTF-8', symbols: '⋆ ✢ ✣ ✤ ✥ ✦ ✧ ✩ ✪ ✫ ✬ ✭ ✮ ✯ ✰ ✱ ✲ ✳ ✴ ✵ ✶ ✷ ✸ ✹ ✺ ✻ ✼ ✽ ✾ ✿ ❀ ❁ ❂ ❃ ❄ ❅ ❆ ❇ ❈ ❉ ❊ ❋ ❖ ✦ ✧' },
+      { title: 'Треугольники UTF-8', symbols: 'вверх — ▲ △ ▴ ▵\nвниз — ▼ ▽ ▾ ▿\nвправо — ▶ ▷ ▸ ▹ ► ▻\nвлево — ◀ ◁ ◂ ◃ ◄ ◅\nдополнительно — ◭ ◮' },
+      { title: 'Расширенные стрелки UTF-8', symbols: '➱ ➲ ➳ ➴ ➵ ➶ ➷ ➸ ➘ ➙ ➚ ➛ ➜ ➝ ➞ ➟ ➠ ➡ ➢ ➣ ➤ ➥ ➦ ➧ ➨ ➩ ➪ ➫ ➬ ➭ ➮ ➯ ➔ ➹ ➺ ➻ ➼ ➽ ➾ ← ↑ → ↓ ↔ ↕ ↖ ↗ ↘ ↙ ↚ ↛ ↜ ↝ ↞ ↟ ↠ ↡ ↢ ↣ ↤ ↥ ↦ ↧ ↨ ↩ ↪ ↫ ↬ ↭ ↮ ↯ ↰ ↱ ↲ ↳ ↴ ↵ ↶ ↷ ↸ ↹ ↼ ↽ ↾ ↿ ⇀ ⇁ ⇂ ⇃ ⇄ ⇅ ⇆ ⇇ ⇈ ⇉ ⇊ ⇋ ⇌ ⇍ ⇎ ⇏ ⇐ ⇑ ⇒ ⇓ ⇔ ⇕ ⇖ ⇗ ⇘ ⇙ ⇚ ⇛ ⇜ ⇝ ⇞ ⇟ ⇠ ⇡ ⇢ ⇣ ⇤ ⇥ ⇦ ⇧ ⇨ ⇩ ⇪ ☇ ↺ ↻ ⏏ ⏩ ⏪ ⏭ ⏮ ⏯ ⊲ ⊳ ⊴ ⊵' },
+      { title: 'Квадраты и прямоугольники UTF-8', symbols: '▁ ▂ ▃ ▄ ▅ ▆ ▇ █ ▉ ▊ ▋ ▌ ▍ ▆ ▇ ■ ▬ ▏ ▕ ▐ ░ ▒ ▓ ▔ ▀ ⧈ ■ □ ▣ ▤ ▥ ▦ ▧ ▨ ▩ ▪ ▫ ▬ ▭ ▮ ▯ ▰ ▱ ◘ ◙ ◚ ◛ ◧ ◨ ◩ ◪ ◫ ☐ ❏ ❐ ❑ ❒ 回 □ ▪ ▫ ░ ▒ ◘ ◙ ▣ ▤ ▥ ▦ ▩ ▧ ▨ ♏ ♒' },
+      { title: 'Кружки UTF-8', symbols: '◍ ◎ ● ◐ ◑ ◒ ◓ ◔ ◕ ◖ ◗ ◯ ✇ ☮ ☯ ❍ ⊕ ⊖ ⊗ ⊘ ⊙ ⊚ ⊛ ⊜ ⊝ ○ ◎ ● ◯ ◕ ◔ ◕ ⊙ ｡ ｡ ☣ ☢ ㊣ ⭘ ● ◦ ○ ◎ ● ☮ ☯ ☢ ☪ ◎ ⏺ ∅ ⋅ ㊚ ㊛ ㊣ ⋅ . ･ ∙ ⋮ ⋯ ⋰ ⋱ ° ∵ ∴ : ﾟ ◦ ❂ ∴ ∵ ∶ ∷ • ᛫ ᛬ ☉ ✚ ✪ ✣ ✤ ✥ ✦ ❉ ❃ ❁ ❀ ☖ ☗ ☀ ☪' },
+      { title: 'Крестики UTF-8', symbols: '╳ ✕ ✖ ✗ ✘ ☓ ❌ ♱ ♰ ✞ ✟ † ‡ † ‡ ☨ ☒' },
+      { title: 'Галочки UTF-8', symbols: '✓ ✔ ✓ ✔ ☑' },
+      { title: 'Плюсики UTF-8', symbols: '✙ ✚ ✛ ✜' },
+      { title: 'Кавычки UTF-8', symbols: '‘ ’ ‚ ‛ “ ” „ ‟ ′ ″ ‴ ‵ ‶ ‷ ′ ″ ‴ ‵ ‶ ‷ ՚ ՛ ՜ ՝ ՞ ❛ ❜ ❝ ❞' },
+      { title: 'Скобки, обводки и штрихи UTF-8', symbols: '─ ━ │ ┃ ┄ ┅ ┆ ┇ ┈ ┉ ┊ ┋ ┌ ┍ – — ┱ ┲ ‑ ‒ – — ― ﹏ ﹋ ﹌ ﹉ ﹊ ﹍ ﹎ ☰ ☱ ☳ ☴ ☶ ☷ ☲ ☵ − ‾ ‗ ⁃ ≣ = Ξ ☲ ☵ ≪ ≫ ┎ ┏ ┐ ┑ ┒ ┓ └ ┕ ┖ ┗ ┘ ┙ ┚ ┛ ├ ┝ ┞ ┟ ┠ ┡ ┢ ┣ ┤ ┥ ┦ ┧ ┨ ┩ ┪ ┫ ┬ ┭ ┮ ┯ ┰ ┱ ┲ ┳ ┴ ┵ ┶ ┷ ┸ ┹ ┺ ┻ ┼ ┽ ┾ ┿ ╀ ╁ ╂ ╃ ╄ ╅ ╆ ╇ ╈ ╉ ╊ ╋ ╌ ╍ ╎ ╏ ═ ║ ╒ ╓ ╔ ╕ ╖ ╗ ╘ ╙ ╚ ╛ ╜ ╝ ╞ ╟ ╠ ╡ ╢ ╣ ╤ ╥ ╦ ╧ ╨ ╩ ╪ ╫ ╬ ╭ ╮ ╯ ╰ ╱ ╲ ╴ ╵ ╶ ╷ ╸ ╹ ╺ ╻ ╼ ╽ ╾ ╿ ☽ ☾ ☽ ⌃ ⌄ ⌅ ⌆ ⌇ ⌈ ⌉ ⌊ ⌋ ∹ ∺ ∻ ∼ ∽ ∾ ∿ ≀ ≁ ≂ ≃ ≄ ≅ ≆ ≇ ≈ ≉ ≊ ≋ ≌ ≍ ⊢ ⊣ ⊤ ⊥ ⊦ ⊧ ⊨ ⊩ ⊪ ⊫ ⊬ ⊭ ⊮ ⊯ ≎ ≏ ≐ ≑ ≒ ≓ ≔ ≕ ≖ ≗ ≘ ≙ ≚ ≛ ≜ ≝ ≞ ≟ ≠ ≡ ≢ ≬ ≭ ≶ ≷ ≸ ≹ ≺ ≻ ≼ ≽ ≾ ≿ ⊀ ⊁ ⊂ ⊃ ⊄ ⊅ ⊆ ⊇ ⊈ ⊉ ⊊ ⊋ ⊌ ⊍ ⊎ ⊏ ⊐ ⊑ ⊒ ⊓ ⊔ ⊡ ⊰ ⊱ ⊲ ⊳ ⊴ ⊵ ⊶ ⊷ ⊸ ⊹ ⊺ ⊻ ⊼ ⊽ ⊾ ⊿ ⋀ ⋁ ⋂ ⋃ ⋇ ⋈ ⋉ ⋊ ⋋ ⋌ ⋍ ⋎ ⋏ ⋐ ⋑ ⋒ ⋓ ⋔ ⋕ ⋖ ⋗ ⋘ ⋙ ⋚ ⋛ ⋜ ⋝ ⋞ ⋟ ﹃ ﹄ ┌ ┐ └ ┘ ∟ 「 」 ⋈ ⋉ ⋊ ⋋ ⋌ ⊻ ⊼ ⊽ ⊾ ⊿ ⋀ ⋁ ⋂ ⋃ ╭ ╮ ╰ ╯ ‖ ︴ ⌠ ⌡ Ξ Σ Π ∃ ∄ ∉ ∋ ∌ ⊂ ⊃ ⊄ ⊅ ∧ ∨ ⊻ ⊼ ⊽ ∥ ⊮ ⊯ ⊶ ⊷ ⊸ ⊹ ⊺ ⋇ ⋍ ⋎ ⋏ ⋐ ⋑ ⋒ ⋓ ⋔ ⋕ ⋖ ⋗ ⋘ ⋙ ⋚ ⋛ ⋜ ⋝ ⋞ ⋟ ⋠ ⋡ ⋢ ⋣ ⋤ ⋥ ⋦ ⋧ ⋨ ⋩ ⋪ ⋫ ⋬ ⋭ ⋲ ⋳ ⋴ ⋵ ⋶ ⋷ ⋸ ⋹ ⋺ ⋻ ⋼ ⋽ ⋾ ⋿ ∣ ∤ ∥ ∦ ∧ ∨ ∩ ∪ ∫ ∬ ∭ ∮ ∯ ∰ « » ๑ ๑ ๑ ⁅ ⁆ ⁐ ℵ ℶ ℷ ℸ ◠ ◡ ╭ ╮ ╯ ╰ ぃ 【 】 ⊂ ⊃ ⁽ ⁾ ʔ ʕ ∊ ∋ ∌ ∍ ∈ ∉ ‸ ‹ ›' },
+      { title: 'Сердечки UTF-8', symbols: '❣ ❤ ❥ ❦ ♠ ♥ ♡ ❧ ♤' },
+      { title: 'Смайлики UTF-8', symbols: '☃ ☻ ☺ ☹ ツ' },
+      { title: 'Игральные кости UTF-8', symbols: '⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ♤ ♧ ♡ ♢' },
+      { title: 'Предметы UTF-8', symbols: '🗡 🏹 🔱 🧪 🪓 ⛏ 🛡 🎣 ✂ 🍖 🔔 ☂ ☔ ⛄ ☃ ⌛ ⌚ ☎ ☏ ✁ ✂ ✃ ✄ ✆ ✎ ✏ ✐ ✑ ✒ ✈ ⚓ ⚛ ⚡ 🌊 ⭐ 🔥 ♔ ♕ ♚ ♛ ♨ ⚔ ☠ ⚠ ۞' },
+      { title: 'Руки UTF-8', symbols: '✌ ✍ ☚ ☛ ☜ ☝ ☞ ☟' },
+      { title: 'Деньги и монеты UTF-8', symbols: '⛀ ⛁ ⛃ ⛂' },
+      { title: 'Ноты UTF-8', symbols: '♪ ♩ ♫ ♬' },
+      { title: 'Погода UTF-8', symbols: '☁ ☀ ☄ 🌧 ⛈ ❄ ☄ ☼ ☀' },
+      { title: 'Уникальные символы UTF-8', symbols: '⚗ ⚑ ✉ ⚐ ☠ ☣ ☤ ☩ ☫ ☬ ☭ ♂ ♀ ☿ ⛨ ۩ ☊ ☋ ☌ ☍ ⁈ ⁉ ☥ ∡ ∢ ∱ ∲ ∳ ∸ ∞ Δ ʊ ღ ₪ ∀' },
+      { title: 'Копирайт и рекламные символы UTF-8', symbols: '® © ℠ ℡ ™' }
+    ];
     let showLineNumbers = true;
+    let currentMode = 'minecraft';
 
     input.addEventListener('input', updateOutput);
 
     function updateOutput() {
       const lines = input.value.split('\n');
       output.innerHTML = '';
+      if (currentMode === 'symbols') {
+        return;
+      }
 
       lines.forEach((line, i) => {
-        const parsed = parseLine(line);
-
         const div = document.createElement('div');
         div.className = 'output-line';
 
-        if (showLineNumbers) {
+        if (currentMode === 'minecraft' && showLineNumbers) {
           const num = document.createElement('div');
           num.className = 'output-line-number';
           num.textContent = i + 1;
@@ -132,102 +304,305 @@
 
         const text = document.createElement('div');
         text.className = 'output-line-text';
-        text.innerHTML = parsed;
+        if (currentMode === 'minecraft') {
+          const parsed = parseLine(line);
+          if (parsed) {
+            text.appendChild(parsed);
+          }
+        } else {
+          text.textContent = convertToTiny(line);
+        }
 
         div.appendChild(text);
         output.appendChild(div);
       });
     }
 
-    function parseLine(text) {
-      text = applyCustomTags(text);
-      text = text.replace(/§/g, '&');
+    function parseLine(rawText) {
+      const fragment = document.createDocumentFragment();
+      if (rawText === undefined || rawText === null) {
+        return fragment;
+      }
+      const text = rawText.replace(/§/g, '&');
+      const customClassStack = [];
+      const customColorStack = [];
+      const mcFormatSet = new Set();
+      let mcColor = '';
+      let buffer = '';
 
-      const regex = /(&[0-9a-fklmnor])|(&x((&[0-9a-fA-F]){6}))|(&#([0-9a-fA-F]{6}))/gi;
-      let result = '';
-      let classes = [];
-      let color = '';
-      let index = 0;
+      const flush = () => {
+        if (!buffer) return;
+        const span = document.createElement('span');
+        const classes = [];
+        mcFormatSet.forEach(cls => {
+          if (!classes.includes(cls)) classes.push(cls);
+        });
+        customClassStack.forEach(entry => {
+          if (!classes.includes(entry.value)) classes.push(entry.value);
+        });
+        const color = customColorStack.length
+          ? customColorStack[customColorStack.length - 1].value
+          : mcColor;
+        if (color) span.style.color = color;
+        if (classes.length) span.className = classes.join(' ');
+        span.textContent = buffer;
+        fragment.appendChild(span);
+        buffer = '';
+      };
 
-      const matches = [...text.matchAll(regex)];
-      for (let match of matches) {
-        let start = match.index;
-        let end = match.index + match[0].length;
-        if (index < start) {
-          result += wrap(text.slice(index, start), color, classes);
-        }
-
-        if (match[2]) {
-          const hex = match[0].replace(/&x/g, '').replace(/&/g, '');
-          if (hex.length === 6) color = '#' + hex;
-        } else if (match[5]) {
-          color = '#' + match[6];
-        } else {
-          const code = match[1][1].toLowerCase();
-          if (code === 'r') {
-            color = '';
-            classes = [];
-          } else if (formatCodes[code]) {
-            if (!classes.includes(formatCodes[code])) {
-              classes.push(formatCodes[code]);
+      let i = 0;
+      while (i < text.length) {
+        if (text[i] === '<') {
+          const tag = readCustomTag(text, i);
+          if (tag) {
+            flush();
+            if (tag.type === 'open') {
+              if (tag.targetType === 'class') {
+                customClassStack.push({ id: tag.id, value: tag.value });
+              } else {
+                customColorStack.push({ id: tag.id, value: tag.value });
+              }
+            } else {
+              if (tag.targetType === 'class') {
+                removeFromStack(customClassStack, tag.id);
+              } else {
+                removeFromStack(customColorStack, tag.id);
+              }
             }
-          } else if (mcColors[code]) {
-            color = mcColors[code];
+            i += tag.length;
+            continue;
           }
         }
-        index = end;
+
+        if (text[i] === '&') {
+          const code = readFormatCode(text, i);
+          if (code) {
+            flush();
+            if (code.type === 'reset') {
+              mcColor = '';
+              mcFormatSet.clear();
+              customClassStack.length = 0;
+              customColorStack.length = 0;
+            } else if (code.type === 'color') {
+              mcColor = code.value;
+              customColorStack.length = 0;
+            } else if (code.type === 'class') {
+              mcFormatSet.add(code.value);
+            }
+            i += code.length;
+            continue;
+          }
+        }
+
+        buffer += text[i];
+        i++;
       }
 
-      if (index < text.length) {
-        result += wrap(text.slice(index), color, classes);
+      flush();
+      if (!fragment.childNodes.length) {
+        fragment.appendChild(document.createTextNode(''));
+      }
+      return fragment;
+    }
+
+    function readCustomTag(text, start) {
+      const end = text.indexOf('>', start);
+      if (end === -1) return null;
+      const content = text.slice(start + 1, end).trim();
+      if (!content) return null;
+      const closing = content.startsWith('/');
+      const body = closing ? content.slice(1) : content;
+      if (!body) return null;
+
+      if (/^#[0-9a-f]{6}$/i.test(body)) {
+        const normalized = body.toLowerCase();
+        return {
+          type: closing ? 'close' : 'open',
+          targetType: 'color',
+          value: '#' + normalized.slice(1),
+          id: `color-${normalized}`,
+          length: end - start + 1
+        };
       }
 
-      return result;
-    }
-
-    function wrap(text, color, classes) {
-      if (!text) return '';
-      let style = color ? `color:${color};` : '';
-      let classAttr = classes.length ? `class="${classes.join(' ')}"` : '';
-      return `<span style="${style}" ${classAttr}>${text}</span>`;
-    }
-
-    function applyCustomTags(text) {
-      text = text.replace(/<#[0-9a-fA-F]{6}>(.*?)<\/#[0-9a-fA-F]{6}>/gs, (_, content) => {
-        const hex = /<#[0-9a-fA-F]{6}>/.exec(_)[0].slice(1, -1);
-        return `<span style="color:${hex}">${content}</span>`;
-      });
-
-      text = text.replace(/<#[0-9a-fA-F]{6}>/g, (m) => {
-        const hex = m.slice(1, -1);
-        return `<span style="color:${hex}">`;
-      });
-
-      text = text.replace(/<([a-z]+)>(.*?)<\/\1>/gi, (_, tag, content) => {
-        if (['bold', 'italic', 'underline'].includes(tag.toLowerCase())) {
-          return `<span class="${tag.toLowerCase()}">${content}</span>`;
-        } else {
-          return `<span style="color:${tag.toLowerCase()}">${content}</span>`;
+      if (/^[a-z]+$/i.test(body)) {
+        const lower = body.toLowerCase();
+        if (['bold', 'italic', 'underline'].includes(lower)) {
+          return {
+            type: closing ? 'close' : 'open',
+            targetType: 'class',
+            value: lower,
+            id: `class-${lower}`,
+            length: end - start + 1
+          };
         }
-      });
+        return {
+          type: closing ? 'close' : 'open',
+          targetType: 'color',
+          value: lower,
+          id: `color-${lower}`,
+          length: end - start + 1
+        };
+      }
 
-      text = text.replace(/<([a-z]+)>/gi, (_, tag) => {
-        if (['bold', 'italic', 'underline'].includes(tag.toLowerCase())) {
-          return `<span class="${tag.toLowerCase()}">`;
-        } else {
-          return `<span style="color:${tag.toLowerCase()}">`;
-        }
-      });
-
-      const openTags = (text.match(/<span/g) || []).length;
-      const closeTags = (text.match(/<\/span>/g) || []).length;
-      return text + '</span>'.repeat(openTags - closeTags);
+      return null;
     }
 
-    function toggleLineNumbers() {
+    function readFormatCode(text, start) {
+      const next = text[start + 1];
+      if (!next) return null;
+      if (next.toLowerCase() === 'x') {
+        let pos = start + 2;
+        let hex = '';
+        for (let j = 0; j < 6; j++) {
+          if (text[pos] === '&' && /[0-9a-f]/i.test(text[pos + 1])) {
+            hex += text[pos + 1];
+            pos += 2;
+          } else {
+            return null;
+          }
+        }
+        return { type: 'color', value: '#' + hex, length: pos - start };
+      }
+
+      if (next === '#') {
+        const hex = text.slice(start + 2, start + 8);
+        if (hex.length === 6 && /^[0-9a-f]{6}$/i.test(hex)) {
+          return { type: 'color', value: '#' + hex, length: 8 };
+        }
+        return null;
+      }
+
+      const codeChar = next.toLowerCase();
+      if (mcColors[codeChar]) {
+        return { type: 'color', value: mcColors[codeChar], length: 2 };
+      }
+      if (formatCodes[codeChar]) {
+        return { type: 'class', value: formatCodes[codeChar], length: 2 };
+      }
+      if (codeChar === 'r') {
+        return { type: 'reset', length: 2 };
+      }
+      return null;
+    }
+
+    function removeFromStack(stack, id) {
+      for (let idx = stack.length - 1; idx >= 0; idx--) {
+        if (stack[idx].id === id) {
+          stack.splice(idx, 1);
+          break;
+        }
+      }
+    }
+
+    function toggleLineNumbers(event) {
       showLineNumbers = !showLineNumbers;
       updateOutput();
-      event.target.innerText = showLineNumbers ? "Отключить номера строк" : "Включить номера строк";
+      const target = (event && event.target) ? event.target : lineToggleButton;
+      if (target) {
+        target.innerText = showLineNumbers ? "Отключить номера строк" : "Включить номера строк";
+      }
+    }
+
+    function setMode(mode) {
+      if (currentMode === mode) return;
+      currentMode = mode;
+
+      document.querySelectorAll('.mode-button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+      });
+
+      if (currentMode === 'minecraft') {
+        input.placeholder = "Вставь текст с & или §...";
+        input.style.display = 'block';
+        lineToggleButton.style.display = 'inline-block';
+        output.classList.remove('hidden');
+        symbolsPanel.classList.add('hidden');
+        symbolsPanel.innerHTML = '';
+      } else if (currentMode === 'tiny') {
+        input.placeholder = "Введи текст для генератора маленьких букв...";
+        input.style.display = 'block';
+        lineToggleButton.style.display = 'none';
+        output.classList.remove('hidden');
+        symbolsPanel.classList.add('hidden');
+        symbolsPanel.innerHTML = '';
+      } else if (currentMode === 'symbols') {
+        input.style.display = 'none';
+        lineToggleButton.style.display = 'none';
+        output.classList.add('hidden');
+        symbolsPanel.classList.remove('hidden');
+        renderSymbols();
+      }
+
+      updateOutput();
+    }
+
+    function convertToTiny(text) {
+      return [...text].map(char => {
+        const lower = char.toLowerCase();
+        return tinyLetters[lower] || char;
+      }).join('');
+    }
+
+    function renderSymbols() {
+      if (!symbolsPanel) return;
+      symbolsPanel.innerHTML = '';
+      symbolCategories.forEach(category => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'symbol-category';
+
+        const header = document.createElement('div');
+        header.className = 'symbol-category-header';
+        header.textContent = category.title;
+
+        const copyButton = document.createElement('button');
+        copyButton.className = 'symbol-copy-btn';
+        copyButton.textContent = 'Скопировать';
+        copyButton.addEventListener('click', () => copySymbols(category.symbols, copyButton));
+        header.appendChild(copyButton);
+
+        const list = document.createElement('div');
+        list.className = 'symbol-text';
+        list.textContent = category.symbols;
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(list);
+        symbolsPanel.appendChild(wrapper);
+      });
+    }
+
+    function copySymbols(text, button) {
+      const onSuccess = () => showCopyFeedback(button);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopy(text, button, onSuccess));
+      } else {
+        fallbackCopy(text, button, onSuccess);
+      }
+    }
+
+    function fallbackCopy(text, button, done) {
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      try {
+        document.execCommand('copy');
+        done();
+      } catch (_) {
+        console.warn('Не удалось скопировать символы');
+      }
+      document.body.removeChild(temp);
+    }
+
+    function showCopyFeedback(button) {
+      if (!button) return;
+      const original = button.textContent;
+      button.textContent = 'Скопировано!';
+      button.disabled = true;
+      setTimeout(() => {
+        button.textContent = original;
+        button.disabled = false;
+      }, 1200);
     }
 
     updateOutput();
