@@ -4,31 +4,63 @@
   <meta charset="UTF-8">
   <title>xani4ka молодец</title>
   <style>
+    :root {
+      --bg: #1e1e1e;
+      --text: #ffffff;
+      --surface: #2b2b2b;
+      --panel: #2b2b2b;
+      --muted: #666666;
+      --button-bg: #3a3a3a;
+      --button-hover: #4a4a4a;
+      --button-text: #ffffff;
+      --card-bg: #252525;
+      --card-border: rgba(255,255,255,0.04);
+      --copy-btn: #444444;
+      --shadow: rgba(0,0,0,0.3);
+    }
+
+    body.light-theme {
+      --bg: #f5f5f5;
+      --text: #1b1b1b;
+      --surface: #ffffff;
+      --panel: #ffffff;
+      --muted: #555555;
+      --button-bg: #e0e0e0;
+      --button-hover: #d0d0d0;
+      --button-text: #111111;
+      --card-bg: #f7f7f7;
+      --card-border: rgba(0,0,0,0.08);
+      --copy-btn: #e4e4e4;
+      --shadow: rgba(0,0,0,0.1);
+    }
+
     body {
       font-family: sans-serif;
-      background: #1e1e1e;
-      color: #fff;
+      background: var(--bg);
+      color: var(--text);
       padding: 20px;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     textarea {
       width: 100%;
       height: 150px;
-      background: #2b2b2b;
-      color: #fff;
+      background: var(--surface);
+      color: var(--text);
       font-family: monospace;
       padding: 12px 14px;
       border: none;
       border-radius: 10px;
       resize: vertical;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+      box-shadow: inset 0 1px 3px var(--shadow);
     }
 
     #output-wrapper {
       margin-top: 20px;
-      background: #2b2b2b;
+      background: var(--panel);
       border-radius: 10px;
       padding: 10px;
+      transition: background 0.2s ease;
     }
 
     .output-line {
@@ -44,7 +76,7 @@
     .output-line-number {
       width: 40px;
       text-align: right;
-      color: #666;
+      color: var(--muted);
       user-select: none;
       padding-right: 10px;
       flex-shrink: 0;
@@ -61,8 +93,8 @@
     button {
       margin-top: 20px;
       padding: 8px 16px;
-      background: #3a3a3a;
-      color: #fff;
+      background: var(--button-bg);
+      color: var(--button-text);
       border: none;
       border-radius: 8px;
       cursor: pointer;
@@ -70,7 +102,7 @@
     }
 
     button:hover {
-      background: #4a4a4a;
+      background: var(--button-hover);
     }
 
     .mode-switch {
@@ -93,6 +125,17 @@
     .hidden {
       display: none;
     }
+    
+    .secondary-controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .secondary-controls button {
+      margin-top: 0;
+    }
 
     #symbols-panel {
       margin-top: 10px;
@@ -102,10 +145,10 @@
     }
 
     .symbol-category {
-      background: #252525;
+      background: var(--card-bg);
       border-radius: 12px;
       padding: 14px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+      box-shadow: inset 0 0 0 1px var(--card-border);
     }
 
     .symbol-category-header {
@@ -122,19 +165,25 @@
       padding: 6px 12px;
       margin-top: 0;
       font-size: 14px;
-      background: #444;
+      background: var(--copy-btn);
+      color: var(--button-text);
     }
 
     .symbol-text {
       font-size: 20px;
       line-height: 1.6;
       word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    body.light-theme .output-line-text span {
+      text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
     }
 
     footer {
       margin-top: 30px;
       text-align: center;
-      color: #aaa;
+      color: var(--muted);
       font-size: 14px;
     }
   </style>
@@ -146,6 +195,10 @@
     <button class="mode-button active" data-mode="minecraft" onclick="setMode('minecraft')">Проверка Minecraft-стиля текста</button>
     <button class="mode-button" data-mode="tiny" onclick="setMode('tiny')">Генератор маленьких букв</button>
     <button class="mode-button" data-mode="symbols" onclick="setMode('symbols')">Коллекция символов</button>
+  </div>
+
+  <div class="secondary-controls">
+    <button id="theme-toggle" onclick="toggleTheme()">Светлая тема</button>
   </div>
 
   <textarea id="input" placeholder="Вставь текст с & или §..."></textarea>
@@ -187,6 +240,12 @@
     const output = document.getElementById('output');
     const lineToggleButton = document.getElementById('line-toggle');
     const symbolsPanel = document.getElementById('symbols-panel');
+    const themeToggleButton = document.getElementById('theme-toggle');
+    const STORAGE_KEYS = {
+      mode: 'homexani-mode',
+      theme: 'homexani-theme'
+    };
+    const availableModes = ['minecraft', 'tiny', 'symbols'];
     const symbolCategories = [
       { title: '❤️ Эмоции, любовь, символы чувств', symbols: '❤ ❥ ღ ❣ ♥ ♡ ❧ ❦ 💖 💘 💝 💞 💓 💗 💕 💔 💌 💟' },
       { title: '✨ Украшения, блеск, звёзды', symbols: '★ ☆ ✮ ✯ ✰ ✩ ✪ ✫ ✬ ✭ ✮ ✯ ✰ ✱ ✲ ✳ ✴ ✵ ✶ ✷ ✸ ✹ ✺ ✻ ✼ ✽ ✾ ✿ ❀ ❁ ❃ ❂ ❇ ❈ ❉ ❊ ❋ ✡ ✢ ✣ ✤ ✥ ✦ ✧ ✨ ❂ ⋆' },
@@ -280,8 +339,13 @@
       { title: 'Копирайт и рекламные символы UTF-8', symbols: '® © ℠ ℡ ™' }
     ];
     let showLineNumbers = true;
-    let currentMode = 'minecraft';
+    const savedMode = localStorage.getItem(STORAGE_KEYS.mode);
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
+    let currentMode = availableModes.includes(savedMode) ? savedMode : 'minecraft';
+    let currentTheme = savedTheme === 'light' ? 'light' : 'dark';
 
+    applyTheme(true);
+    setMode(currentMode, true);
     input.addEventListener('input', updateOutput);
 
     function updateOutput() {
@@ -504,9 +568,13 @@
       }
     }
 
-    function setMode(mode) {
-      if (currentMode === mode) return;
+    function setMode(mode, skipPersist = false) {
+      if (!availableModes.includes(mode)) {
+        mode = 'minecraft';
+      }
+      const shouldSkip = currentMode === mode && !skipPersist;
       currentMode = mode;
+      if (shouldSkip) return;
 
       document.querySelectorAll('.mode-button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.mode === mode);
@@ -534,6 +602,9 @@
         renderSymbols();
       }
 
+      if (!skipPersist) {
+        localStorage.setItem(STORAGE_KEYS.mode, currentMode);
+      }
       updateOutput();
     }
 
@@ -603,6 +674,21 @@
         button.textContent = original;
         button.disabled = false;
       }, 1200);
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme();
+    }
+
+    function applyTheme(skipPersist = false) {
+      document.body.classList.toggle('light-theme', currentTheme === 'light');
+      if (themeToggleButton) {
+        themeToggleButton.textContent = currentTheme === 'light' ? 'Тёмная тема' : 'Светлая тема';
+      }
+      if (!skipPersist) {
+        localStorage.setItem(STORAGE_KEYS.theme, currentTheme);
+      }
     }
 
     updateOutput();
