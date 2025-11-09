@@ -105,6 +105,27 @@
       background: var(--button-hover);
     }
 
+    .hidden {
+      display: none;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .header-bar h1 {
+      margin: 0;
+    }
+
+    .header-bar button {
+      margin-top: 0;
+    }
+
     .mode-switch {
       display: flex;
       gap: 10px;
@@ -120,21 +141,6 @@
     .mode-button.active {
       background: #5c5cff;
       color: #fff;
-    }
-
-    .hidden {
-      display: none;
-    }
-    
-    .secondary-controls {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .secondary-controls button {
-      margin-top: 0;
     }
 
     #symbols-panel {
@@ -189,16 +195,15 @@
   </style>
 </head>
 <body>
-  <h1>ТГК: HomeXani</h1>
+  <div class="header-bar">
+    <h1>ТГК: HomeXani</h1>
+    <button id="theme-toggle" onclick="toggleTheme()">Светлая тема</button>
+  </div>
 
   <div class="mode-switch">
     <button class="mode-button active" data-mode="minecraft" onclick="setMode('minecraft')">Проверка Minecraft-стиля текста</button>
     <button class="mode-button" data-mode="tiny" onclick="setMode('tiny')">Генератор маленьких букв</button>
     <button class="mode-button" data-mode="symbols" onclick="setMode('symbols')">Коллекция символов</button>
-  </div>
-
-  <div class="secondary-controls">
-    <button id="theme-toggle" onclick="toggleTheme()">Светлая тема</button>
   </div>
 
   <textarea id="input" placeholder="Вставь текст с & или §..."></textarea>
